@@ -13,7 +13,6 @@ def cli(csvfile):
     click.echo(click.format_filename(csvfile))
     data = csv_parser.parse_data(csvfile)
     fields = choose_fields(list(data.keys()))
-    print(fields)
     plot_data(fields, data)
 
 def plot_data(fields, data):
@@ -42,9 +41,8 @@ def plot_data(fields, data):
             print("y[0]:",y[0])
             exit(0)
         # Set up each subplot 
-        print(len(axes))
         axes[idx].plot(x,y)
-        #axes[idx].ylabel(field)
+        axes[idx].set_ylabel(field)
         #axes[idx].yticks(np.arange(y_min, y_max, y_step))
         """
         plt.subplot(rows, cols, idx+1)
