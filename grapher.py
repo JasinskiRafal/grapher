@@ -13,6 +13,7 @@ def cli(csvfile):
     click.echo(click.format_filename(csvfile))
     data = csv_parser.parse_data(csvfile)
     fields = choose_fields(list(data.keys()))
+    print(fields)
     plot_data(fields, data)
 
 def plot_data(fields, data):
@@ -21,8 +22,9 @@ def plot_data(fields, data):
     # plot_number goes up to x*y
     rows = len(fields)
     cols = 1
-
-    plt.figure(num=1)
+    #fig = plt.figure(num=1)
+    fig, axes = plt.subplots(rows, cols, sharex=True)
+    plt.gca().grid(True, linewidth=0.7, linestyle=':')
     for idx,field in enumerate(fields):
         x = range(0,len(data[field]), 1) # no of data points 
         y = data[field]
@@ -34,22 +36,25 @@ def plot_data(fields, data):
             y_step = (y_max - y_min) / 10
         elif isinstance(y[0],str) and not y[0].isdecimal():
             print("Data is string but not a decimal string,  of type:", type(y[0]))
-            y = range(0,10) # data[field] are letters, unsure what to do
             exit(0)
         else:
             print("Data is of type:", type(y[0]))
             print("y[0]:",y[0])
-            y = range(0,10) # data[field] are letters, unsure what to do
             exit(0)
-
+        # Set up each subplot 
+        print(len(axes))
+        axes[idx].plot(x,y)
+        #axes[idx].ylabel(field)
+        #axes[idx].yticks(np.arange(y_min, y_max, y_step))
+        """
         plt.subplot(rows, cols, idx+1)
         plt.plot(x, y)
-        plt.xlabel("Number of datapoints")
         plt.ylabel(field)
         plt.yticks(np.arange(y_min, y_max, y_step))
-    plt.autoscale(enable=True, axis='both')
+        """
     mng = plt.get_current_fig_manager()
     mng.full_screen_toggle()
+    ax_list = fig.axes
     plt.show()
 
 def choose_fields(fields):
@@ -66,13 +71,17 @@ def choose_fields(fields):
         # If a user's string is a substring of an element in <fields>,
         # print it separated by newlines
         possible_fields = [s for s in fields if field in s]
-        if len(possible_fields) == 1:
-            stdscr.addstr("\n")
-            stdscr.addstr("\n".join(possible_fields), curses.A_BLINK)
-        else:
-            stdscr.addstr("\n")
-            stdscr.addstr("\n".join(possible_fields))
-        stdscr.addstr("\n>:%s" % field)
+        try:
+            if len(possible_fields) == 1:
+                stdscr.addstr("\n")
+                stdscr.addstr("\n".join(possible_fields), curses.A_BLINK)
+            else:
+                stdscr.addstr("\n")
+                stdscr.addstr("\n".join(possible_fields))
+            stdscr.addstr("\n>:%s" % field)
+        except:
+            # Sometimes this throws an error
+            pass
 
     stdscr.addstr("Variable(s) to graph:")
     for idx, f in enumerate(fields):
@@ -91,6 +100,13 @@ def choose_fields(fields):
                 if len(field) > 0:
                     field = field[:-1]
                 print_fields(fields, field)
+            elif ord(char) in [curses.KEY_ENTER, 10] and sum(field in s for s in fields) == 1:
+                # There is only one instance of field in fields
+                # Grab the field that the user's input has matched to 
+                chosen_fields += list(filter(lambda x: field in x, fields))
+                # Reset the field, ready to choose again
+                field = ''
+                print_fields(fields, field)
             elif ord(char) in [curses.KEY_ENTER, 10] and field == '':
                 # String is empty and user pressed enter so exit
                 stdscr.clear()
@@ -98,13 +114,6 @@ def choose_fields(fields):
             elif ord(char) in [curses.KEY_ENTER, 10] and field not in fields:
                 # User pressed enter and no field is ready to be chosen,
                 # so clear the field
-                field = ''
-                print_fields(fields, field)
-            elif ord(char) in [curses.KEY_ENTER, 10] and sum(field in s for s in fields) == 1:
-                # There is only one instance of field in fields
-                # Grab the field that the user's input has matched to 
-                chosen_fields += filter(lambda x: field in x, fields)
-                # Reset the field, ready to choose again
                 field = ''
                 print_fields(fields, field)
             else:
