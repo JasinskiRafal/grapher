@@ -4,6 +4,8 @@ import sys, traceback, termios, tty, os, time
 import csv_parser # Is part of grapher
 import numpy as np
 import matplotlib.pyplot as plt
+import math
+from collections import Iterable
 
 button_delay = 0.25
 
@@ -32,7 +34,7 @@ def plot_data(fields, data):
             y = list(map(int, y)) # Turn all y into ints
             y_min = min(y)
             y_max = max(y) + 1
-            y_step = (y_max - y_min) / 10
+            y_step = math.floor((y_max - y_min) / 10)
         elif isinstance(y[0],str) and not y[0].isdecimal():
             print("Data is string but not a decimal string,  of type:", type(y[0]))
             exit(0)
@@ -41,18 +43,19 @@ def plot_data(fields, data):
             print("y[0]:",y[0])
             exit(0)
         # Set up each subplot 
-        axes[idx].plot(x,y)
-        axes[idx].set_ylabel(field)
-        #axes[idx].yticks(np.arange(y_min, y_max, y_step))
-        """
-        plt.subplot(rows, cols, idx+1)
-        plt.plot(x, y)
-        plt.ylabel(field)
-        plt.yticks(np.arange(y_min, y_max, y_step))
-        """
+        if isinstance(axes,Iterable):
+            # List of axes
+            axes[idx].plot(x,y)
+            axes[idx].set_ylabel(field)
+            axes[idx].set_yticks(np.arange(y_min, y_max, y_step))
+        else:
+            # Just one axis
+            axes.plot(x,y)
+            axes.set_ylabel(field)
+            axes.set_yticks(np.arange(y_min, y_max, y_step))
     mng = plt.get_current_fig_manager()
     mng.full_screen_toggle()
-    ax_list = fig.axes
+    plt.xlabel("Data point #")
     plt.show()
 
 def choose_fields(fields):
