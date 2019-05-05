@@ -1,7 +1,7 @@
 import click
 import curses
 import sys, traceback, termios, tty, os, time
-import csv_parser # Is part of grapher
+import csv_parser # Part of grapher
 import numpy as np
 import matplotlib.pyplot as plt
 import math
@@ -20,9 +20,8 @@ def plot_data(fields, data):
     # Plot the selected fields
     # subplot(xyz) where x=numrows,y=numcols,z=plot_number
     # plot_number goes up to x*y
-    rows = len(fields)
+    rows = len(fields) # One plot per field
     cols = 1
-    #fig = plt.figure(num=1)
     fig, axes = plt.subplots(rows, cols, sharex=True)
     plt.gca().grid(True, linewidth=0.7, linestyle=':')
     for idx,field in enumerate(fields):
@@ -33,7 +32,12 @@ def plot_data(fields, data):
             y = list(map(int, y)) # Turn all y into ints
             y_min = min(y)
             y_max = max(y) + 1
-            y_step = math.floor((y_max - y_min) / 10)
+            if y_max - y_min <= 15:
+                y_step = 1
+            else:
+                # more than 15 ticks on the y axis is annoying so just average it otu
+                y_step = math.floor((y_max - y_min) / 10)
+
         elif isinstance(y[0],str) and not y[0].isdecimal():
             print("Data is string but not a decimal string,  of type:", type(y[0]))
             exit(0)
@@ -43,7 +47,7 @@ def plot_data(fields, data):
             exit(0)
         # Set up each subplot 
         if hasattr(axes, "__iter__"):
-            # List of axes
+            # Multiple axes
             axes[idx].plot(x,y)
             axes[idx].set_ylabel(field)
             axes[idx].set_yticks(np.arange(y_min, y_max, y_step))
@@ -53,8 +57,8 @@ def plot_data(fields, data):
             axes.set_ylabel(field)
             axes.set_yticks(np.arange(y_min, y_max, y_step))
     mng = plt.get_current_fig_manager()
-    mng.full_screen_toggle()
-    plt.xlabel("Data point #")
+    mng.full_screen_toggle() # Default to full screen
+    plt.xlabel("Data point #") # This x axis is shared across plots
     plt.show()
 
 def choose_fields(fields):
