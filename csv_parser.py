@@ -32,19 +32,27 @@ def parse_csv_data(input_file):
 def parse_log_csv_data(input_file):
     reader, opened_file = get_reader(input_file)
     # Grab header data
-    raw_data = []
-    date_time = []
-    var_names = []
-    for row in reader:
-        raw_data.append(row)
+    fields = reader.__next__()
+    data = {}
+    buf = []
 
-    for idx,col in enumerate(raw_data[0]):
-        # Go thru first row col by col
-        if idx == 0:
-            date_time.append(col)
-        elif len(col) > 1:
-            # Strip whitespace
-            var_names.append(col.strip())
+    for row_idx,row in enumerate(reader):
+        # Goes down to next row
+        for col_idx,field in enumerate(fields):
+            # Goes across columns (fields)
+            if row_idx == 0:
+                # First run-thru is a special case
+                data[field] = [row[col_idx]]
+            elif row_idx == 1:
+                # Don't care about raw,calc,enum
+                pass
+            else:
+                if col_idx % 3 == 0:
+                    # Only grab col divisible by 3, skip calc and enum values
+                    buf = data[field]
+                    buf.append(row[col_idx])
+                    data[field] = buf
+
     opened_file.close()
 
 def parse_data(input_file):

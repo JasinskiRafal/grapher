@@ -5,7 +5,6 @@ import csv_parser # Is part of grapher
 import numpy as np
 import matplotlib.pyplot as plt
 import math
-from collections import Iterable
 
 button_delay = 0.25
 
@@ -43,7 +42,7 @@ def plot_data(fields, data):
             print("y[0]:",y[0])
             exit(0)
         # Set up each subplot 
-        if isinstance(axes,Iterable):
+        if hasattr(axes, "__iter__"):
             # List of axes
             axes[idx].plot(x,y)
             axes[idx].set_ylabel(field)
