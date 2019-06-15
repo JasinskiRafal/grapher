@@ -8,38 +8,44 @@
 #include <vector>
 #include <iterator>
 #include <variant>
+#include <unordered_map>
 
 namespace logdb
 {
-	using flexVector =
-		std::variant<std::vector<int>, std::vector<float>, std::vector<std::string>>;
+    using variantVector =
+        std::variant<std::vector<int>,std::vector<float>,std::vector<std::string>>;
+    // Supported types
+    enum varType {UNDEFINED, INT, FLOAT, STRING};
 
-	class LogVariable
-	{
-		public:
-			LogVariable(std::string fieldName);
-			~LogVariable();
+    class LogVariable
+    {
+        // This describes a variable. Supplies the type as well as the
+        // history of data points in m_values
+        public:
+            LogVariable();
+            ~LogVariable();
+            void addData(std::string value);
+            variantVector getValues();
+            varType getType();
 
-			void addData(std::string value); // Deduce the data type and add it to vector
+        private:
+            varType deduceType(std::string value);
+            variantVector m_values;
+            varType  m_type;
 
-		private:
-			std::string fieldName;
-			// A vector of ints, a vector of floats, or a vector of strings:
-			flexVector values;
+    };
 
-	};
-
-	class LogDatabase
-	{
-		public:
-			LogDatabase(std::string filename);
-			LogDatabase();
-			~LogDatabase();
-			void parseFile(std::string filename);
-			// Search for the field name in the database, grab the corresponding data points
-			flexVector* getDataPoints(std::string fieldName);
-		private:
-			std::vector<LogVariable> logVars;
-	};
+    class LogDatabase
+    {
+        public:
+            LogDatabase(std::string filename);
+            LogDatabase();
+            ~LogDatabase();
+            void parseFile(std::string filename);
+            LogVariable getDataPoints(std::string fieldname);
+            std::vector<std::string> getFieldList();
+        private:
+            std::unordered_map<std::string, LogVariable*> m_logMap;
+    };
 }
 #endif
