@@ -87,13 +87,13 @@ std::vector<std::string> getFieldsFromUser(std::vector<std::string> fields)
         {
             case KEY_BACKSPACE:
             case 127:
-                if (userInput.size() > 1)
+                if (userInput.size() > 0)
                     userInput.pop_back();
                 clear();
                 updateMatchedFields(userInput, unpickedFields, matchedFields);
                 break;
             case KEY_ENTER:
-            case 10:
+            case 36:
                 if (userInput.empty())
                 {   // User is done making choices
                     clear();
