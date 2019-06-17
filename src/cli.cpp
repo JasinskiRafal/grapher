@@ -46,17 +46,17 @@ void printFields(WINDOW* stdscr,
                  std::vector<std::string> pickedFields)
 {
     addstr("Available fields:\n");
-    for (auto const& f : matchedFields)
+    for (auto const& m : matchedFields)
     {
         // Print out all the choices
-        addstr((f + "\n").c_str());
+        addstr((m + "\n").c_str());
     }
     addstr("---------\n");
     addstr("Selected:\n");
-    for (auto const& f : pickedFields)
+    for (auto const& p : pickedFields)
     {
         // Print out all the choices
-        addstr((f + "\n").c_str());
+        addstr((p + "\n").c_str());
     }
     addstr("---------\n");
     addstr((userInput + "\n").c_str());
@@ -85,6 +85,7 @@ std::vector<std::string> getFieldsFromUser(std::vector<std::string> fields)
         ch = getch();
         switch(ch) 
         {
+
             case KEY_BACKSPACE:
             case 127:
                 if (userInput.size() > 0)
@@ -94,6 +95,7 @@ std::vector<std::string> getFieldsFromUser(std::vector<std::string> fields)
                 break;
             case KEY_ENTER:
             case 36:
+            case 10:
                 if (userInput.empty())
                 {   // User is done making choices
                     clear();
@@ -105,7 +107,7 @@ std::vector<std::string> getFieldsFromUser(std::vector<std::string> fields)
                     // User chose a field
                     pickedFields.push_back(matchedFields.front());
                     // Remove it from our unpicked fields
-                    removeField(unpickedFields, pickedFields.back());
+                    removeField(unpickedFields, matchedFields.front());
                     userInput.clear(); // Clear our input
                     matchedFields = unpickedFields;
                     clear();
@@ -117,6 +119,7 @@ std::vector<std::string> getFieldsFromUser(std::vector<std::string> fields)
                     matchedFields = unpickedFields; // Our input is clear
                     clear();
                 }
+                break;
             default:
                 userInput += static_cast<char>(ch);
                 clear();
