@@ -1,8 +1,4 @@
-#include <ncurses.h>
-#include <iostream>
-#include <csignal>
-
-#include "csv_logdb.hpp"
+#include "cli.hpp"
 
 void signalHandler(int signum)
 {
@@ -10,7 +6,7 @@ void signalHandler(int signum)
     exit(signum);
 }
 
-void updateMatchedFields(std::string userInput,
+void GrapherCLI::updateMatchedFields(std::string userInput,
                          std::vector<std::string> fields,
                          std::vector<std::string>& matchedFields)
 {
@@ -24,7 +20,7 @@ void updateMatchedFields(std::string userInput,
     }
 }
 
-void removeField(std::vector<std::string>& fields, std::string fieldToRemove)
+void GrapherCLI::removeField(std::vector<std::string>& fields, std::string fieldToRemove)
 {
     for (auto it = fields.begin(); it != fields.end();)
     {
@@ -40,10 +36,9 @@ void removeField(std::vector<std::string>& fields, std::string fieldToRemove)
     }
 }
 
-void printFields(WINDOW* stdscr,
-                 std::string userInput,
-                 std::vector<std::string> matchedFields,
-                 std::vector<std::string> pickedFields)
+void GrapherCLI::printFields(WINDOW* stdscr, std::string userInput,
+                             std::vector<std::string> matchedFields,
+                             std::vector<std::string> pickedFields)
 {
     addstr("Available fields:\n");
     for (auto const& m : matchedFields)
@@ -62,7 +57,7 @@ void printFields(WINDOW* stdscr,
     addstr((userInput + "\n").c_str());
 }
 
-std::vector<std::string> getFieldsFromUser(std::vector<std::string> fields)
+std::vector<std::string> GrapherCLI::getFieldsFromUser(std::vector<std::string> fields)
 {
     signal(SIGINT, signalHandler);
     initscr();
@@ -130,23 +125,4 @@ std::vector<std::string> getFieldsFromUser(std::vector<std::string> fields)
         printFields(stdscr, userInput, matchedFields, pickedFields);
     } // End of for (;;)
 
-}
-
-
-int main(int argc, char** argv)
-{
-    if (argc != 2)
-    {
-        std::cout << "Usage driver <file.csv>" << std::endl;
-        return 0;
-    }
-    // Take the file as input
-    std::string file(argv[1]);
-    std::cout << "Parsing file:" << file << std::endl;
-    LogDatabase logDb = LogDatabase(file);
-    std::vector<std::string> allFields = logDb.getFields();
-    std::vector<std::string> pickedFields;
-    pickedFields = getFieldsFromUser(allFields);
-
-    return 0;
 }
