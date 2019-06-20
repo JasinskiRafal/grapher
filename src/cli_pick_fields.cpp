@@ -6,7 +6,10 @@ void signalHandler(int signum)
     exit(signum);
 }
 
-void GrapherCLI::updateMatchedFields(std::string userInput,
+/////////////////////////////////////////////
+// CLI implemenation
+/////////////////////////////////////////////
+void CLI::updateMatchedFields(std::string userInput,
                          std::vector<std::string> fields,
                          std::vector<std::string>& matchedFields)
 {
@@ -20,7 +23,7 @@ void GrapherCLI::updateMatchedFields(std::string userInput,
     }
 }
 
-void GrapherCLI::removeField(std::vector<std::string>& fields, std::string fieldToRemove)
+void CLI::removeField(std::vector<std::string>& fields, std::string fieldToRemove)
 {
     for (auto it = fields.begin(); it != fields.end();)
     {
@@ -36,7 +39,7 @@ void GrapherCLI::removeField(std::vector<std::string>& fields, std::string field
     }
 }
 
-void GrapherCLI::printFields(WINDOW* stdscr, std::string userInput,
+void CLI::printFields(WINDOW* stdscr, std::string userInput,
                              std::vector<std::string> matchedFields,
                              std::vector<std::string> pickedFields)
 {
@@ -57,7 +60,7 @@ void GrapherCLI::printFields(WINDOW* stdscr, std::string userInput,
     addstr((userInput + "\n").c_str());
 }
 
-std::vector<std::string> GrapherCLI::getFieldsFromUser(std::vector<std::string> fields)
+std::vector<std::string> CLI::getFieldsFromUser(std::vector<std::string> fields)
 {
     signal(SIGINT, signalHandler);
     initscr();
@@ -85,7 +88,6 @@ std::vector<std::string> GrapherCLI::getFieldsFromUser(std::vector<std::string> 
             case 127:
                 if (userInput.size() > 0)
                     userInput.pop_back();
-                clear();
                 updateMatchedFields(userInput, unpickedFields, matchedFields);
                 break;
             case KEY_ENTER:
@@ -105,24 +107,24 @@ std::vector<std::string> GrapherCLI::getFieldsFromUser(std::vector<std::string> 
                     removeField(unpickedFields, matchedFields.front());
                     userInput.clear(); // Clear our input
                     matchedFields = unpickedFields;
-                    clear();
                 }
                 else
                 {
                     // Invalid choice
                     userInput.clear();
                     matchedFields = unpickedFields; // Our input is clear
-                    clear();
                 }
                 break;
             default:
                 userInput += static_cast<char>(ch);
-                clear();
                 updateMatchedFields(userInput, unpickedFields, matchedFields);
                 break;
-        }
+        } // End of switch(ch)
+
+				clear();
         // Print every cycle
         printFields(stdscr, userInput, matchedFields, pickedFields);
+
     } // End of for (;;)
 
 }

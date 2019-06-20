@@ -45,7 +45,7 @@ void LogDatabase::parseFile(std::string filename)
 }
 
 // Search for the field name in the database, grab the corresponding data points
-std::vector<std::string> LogDatabase::getFieldValues(std::string fieldname)
+FieldValues LogDatabase::getFieldValues(std::string fieldname)
 {
     auto search = m_logMap.find(fieldname);
     if (search == m_logMap.end())
@@ -61,7 +61,12 @@ std::vector<std::string> LogDatabase::getFieldValues(std::string fieldname)
     
 }
 
-std::vector<std::string> LogDatabase::getFields()
+FieldMap LogDatabase::getFieldMap()
+{
+    return m_logMap;
+}
+
+FieldList LogDatabase::getFields()
 {
     // No build in method to grab keys from unordered_map
     std::vector<std::string> v;
