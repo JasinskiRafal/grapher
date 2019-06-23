@@ -37,7 +37,7 @@ void Graph::parseValues(std::vector<std::string_view> fieldvalues)
     for (auto const& str: fieldvalues)
     {
         // Try to parse field value
-        // TODO Use from_chars correctly someho
+        // TODO Use from_chars correctly somehow
         if (auto [p, ec] =
          std::from_chars(str.data(), str.data()+str.size(), flt_point);
             ec == std::errc())
@@ -60,7 +60,6 @@ void Graph::parseValues(std::vector<std::string_view> fieldvalues)
 ////////////////////////////////////
 // GraphGroup implementation
 ////////////////////////////////////
-
 GraphGroup::GraphGroup(const GraphGroup& gGroup)
 {
     m_graphs   = gGroup.m_graphs;
@@ -80,15 +79,23 @@ GraphGroup::GraphGroup() { }
 //  Add graphs into the group
 GraphGroup GraphGroup::operator+=(const Graph& rhs)
 { 
-
+    m_graphs.push_back(rhs);
 }
 //  Add another graph group into the group
 GraphGroup GraphGroup::operator+=(const GraphGroup& rhs)
 { 
-
+    // Insert the rhs vector onto our member vector
+    m_graphs.insert(std::end(a), std::begin(b), std::end(b));
 }
 
 void GraphGroup::removeGraph(std::string_view field)
 {
-
+    // Search for field in our graphs, remove it if it exists
+    for (auto it = m_graphs.begin(); it != m_graphs.end())
+    {
+        if ((*it).getFieldname() == field)
+        {
+            m_graphs.erase(it);
+        }
+    }
 }

@@ -3,7 +3,7 @@
 ////////////////////////////////////
 // Window implementation
 ////////////////////////////////////
-void Window::addGraphGroup(GraphGroup& gGroup)
+Window Window::operator+=(const GraphGroup& rhs)
 {
 
 }

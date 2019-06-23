@@ -2,7 +2,7 @@ project(grapher)
 cmake_minimum_required (VERSION 3.1)
 set(CMAKE_CXX_COMPILER "clang++")
 set(CMAKE_CXX_STANDARD 17)
-find_package(PythonLibs 3.7)
+find_package(PythonLibs 3.5)
 
 # Sub-projects in this project:
 # csvparse - deals with taking in CSV files and translating
@@ -16,7 +16,7 @@ find_package(PythonLibs 3.7)
 add_library(csvparse src/csv_parser.cpp src/csv_logdb.cpp)
 
 # Our actual binary executable is 'driver'
-add_executable(driver src/main.cpp src/graph.cpp src/cli_pick_fields.cpp)
+add_executable(driver src/main.cpp src/cli_graph.cpp src/graph.cpp src/cli_pick_fields.cpp)
 
 # Use /include for linking the libs
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
@@ -25,8 +25,7 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libraries/matplotlib-cpp)
 
 target_include_directories(driver PRIVATE ${PYTHON_INCLUDE_DIRS})
 # Odd numpy inclusion
-target_include_directories(driver PRIVATE /usr/lib/python3.7/site-packages/numpy/core/include)
+target_include_directories(driver PRIVATE ${PYTHON_LIBRARIES}/site-packages/numpy/core/include)
 
 # Link ncurses since the CLI lib will need it
-target_link_libraries(driver csvparse ncurses) 
-target_link_libraries(driver ${PYTHON_LIBRARIES}) 
+target_link_libraries(driver csvparse ncurses ${PYTHON_LIBRARIES}) 
