@@ -51,6 +51,14 @@
         "typeinfo": "cpp",
         "utility": "cpp",
         "variant": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "csignal": "cpp",
+        "bit": "cpp",
+        "condition_variable": "cpp",
+        "map": "cpp",
+        "set": "cpp",
+        "mutex": "cpp",
+        "string": "cpp",
+        "thread": "cpp"
     }
 }

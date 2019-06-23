@@ -28,4 +28,15 @@ class CLI
         std::vector<Graph> m_graphs;
 };
 
+// Combines multiple graph groups, each with independent axes
+class Window
+{
+    public:
+        void removeGraphGroup(int groupIdx);
+        Window operator+=(const GraphGroup& rhs);
+        void draw();
+    private:
+        std::vector<GraphGroup> m_graphGroups;
+};
+
 #endif

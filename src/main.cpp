@@ -18,10 +18,10 @@ int main(int argc, char** argv)
     // Parse the CSV
     LogDatabase logDb = LogDatabase(file);
     // Get the fields from our database
-    allFields = logDb.getFields();
+    allFields = logDb.getFieldnames();
     
     // Figure out which fields the user wants to visualize
-    GrapherCLI cli;
+    CLI cli;
     pickedFields = cli.getFieldsFromUser(allFields);
 
     return 0;
