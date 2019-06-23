@@ -13,19 +13,22 @@ find_package(PythonLibs 3.5)
 # graph    - Builds graphs according to the directions from CLI 
 
 # Our CSV parser is going to be a library
-add_library(csvparse src/csv_parser.cpp src/csv_logdb.cpp)
+file(GLOB csv_SRC "src/csv/*.cpp")
+add_library(csvparse ${csv_SRC})
 
 # Our actual binary executable is 'driver'
-add_executable(driver src/main.cpp src/cli_graph.cpp src/graph.cpp src/cli_pick_fields.cpp)
+file(GLOB exec_SRC "src/*.cpp")
+add_executable(driver ${exec_SRC})
 
 # Use /include for linking the libs
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
-# Add on third party library
+# Add on matplotlib interface headers
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libraries/matplotlib-cpp)
 
 target_include_directories(driver PRIVATE ${PYTHON_INCLUDE_DIRS})
 # Odd numpy inclusion
-target_include_directories(driver PRIVATE ${PYTHON_LIBRARIES}/site-packages/numpy/core/include)
+#target_include_directories(driver PRIVATE ${PYTHON_LIBRARIES}/site-packages/numpy/core/include)
+target_include_directories(driver PRIVATE /usr/lib/python3.7/site-packages/numpy/core/include)
 
 # Link ncurses since the CLI lib will need it
 target_link_libraries(driver csvparse ncurses ${PYTHON_LIBRARIES}) 

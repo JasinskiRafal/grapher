@@ -2,6 +2,7 @@
 #include <charconv>
 
 #include "cli.hpp"
+#include "graph.hpp"
 #include "matplotlibcpp.h"
 
 namespace plt = matplotlibcpp;
@@ -10,7 +11,7 @@ namespace plt = matplotlibcpp;
 ////////////////////////////////////
 // Graph implementation
 ////////////////////////////////////
-Graph::Graph(std::pair<std::string_view, std::vector<std::string_view>> field)
+Graph::Graph(std::pair<std::string, std::vector<std::string>> field)
     :m_fieldname(field.first), m_fieldvalues(field.second) { }
 Graph::Graph() {}
 
@@ -22,7 +23,12 @@ void Graph::adjustScale(std::tuple<int, int, float> domain,
 {
 }
 
-void Graph::parseValues(std::vector<std::string_view> fieldvalues)
+std::string Graph::getFieldname()
+{
+    return m_fieldname;
+}
+
+void Graph::parseValues(std::vector<std::string> fieldvalues)
 {
     // Buffer input so we don't add to our class variables if we get
     // an exception
@@ -31,22 +37,15 @@ void Graph::parseValues(std::vector<std::string_view> fieldvalues)
     // Fill x axis with ascending values
     std::iota(x_buf.begin(), x_buf.end(), 0);
     std::string::size_type size;
-    float flt_point;
     float y_max = 0.0, y_min = 0.0;
 
     for (auto const& str: fieldvalues)
     {
         // Try to parse field value
-        // TODO Use from_chars correctly somehow
-        if (auto [p, ec] =
-         std::from_chars(str.data(), str.data()+str.size(), flt_point);
-            ec == std::errc())
-        {
-            y_buf.push_back(flt_point);
-        }
-        else
-        {
-            return;
+        try {
+            y_buf.push_back(stof(str, &size));
+        } catch (std::invalid_argument e) {
+            return; // Could not parse float
         }
         
     }
@@ -79,19 +78,28 @@ GraphGroup::GraphGroup() { }
 //  Add graphs into the group
 GraphGroup GraphGroup::operator+=(const Graph& rhs)
 { 
-    m_graphs.push_back(rhs);
+    this->m_graphs.push_back(rhs);
+    return *this;
+}
+
+const std::vector<Graph> GraphGroup::getGraphs() const
+{
+    return m_graphs;
 }
 //  Add another graph group into the group
 GraphGroup GraphGroup::operator+=(const GraphGroup& rhs)
 { 
     // Insert the rhs vector onto our member vector
-    m_graphs.insert(std::end(a), std::begin(b), std::end(b));
+    const std::vector<Graph> rhs_graphs = rhs.getGraphs();
+    this->m_graphs.insert(m_graphs.end(),
+                          rhs_graphs.begin(), rhs_graphs.end());
+    return *this;
 }
 
-void GraphGroup::removeGraph(std::string_view field)
+void GraphGroup::removeGraph(std::string field)
 {
     // Search for field in our graphs, remove it if it exists
-    for (auto it = m_graphs.begin(); it != m_graphs.end())
+    for (auto it = m_graphs.begin(); it != m_graphs.end();)
     {
         if ((*it).getFieldname() == field)
         {

@@ -11,7 +11,7 @@ void signalHandler(int signum)
 /////////////////////////////////////////////
 void CLI::updateMatchedFields(std::string userInput,
                          std::vector<std::string> fields,
-                         std::vector<std::string>& matchedFields)
+                         std::vector<std::string> matchedFields)
 {
     matchedFields.clear(); // Start from scratch
     for (int i = 0; i < fields.size(); i++)
@@ -23,7 +23,8 @@ void CLI::updateMatchedFields(std::string userInput,
     }
 }
 
-void CLI::removeField(std::vector<std::string>& fields, std::string fieldToRemove)
+void CLI::removeField(std::vector<std::string> fields,
+                      std::string fieldToRemove)
 {
     for (auto it = fields.begin(); it != fields.end();)
     {
@@ -60,7 +61,8 @@ void CLI::printFields(WINDOW* stdscr, std::string userInput,
     addstr((userInput + "\n").c_str());
 }
 
-std::vector<std::string> CLI::getFieldsFromUser(std::vector<std::string> fields)
+std::vector<std::string>
+    CLI::getFieldsFromUser(std::vector<std::string> fields)
 {
     signal(SIGINT, signalHandler);
     initscr();

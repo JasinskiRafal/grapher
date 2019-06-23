@@ -19,8 +19,8 @@ class CLI
     private:
         void updateMatchedFields(std::string userInput,
                                 std::vector<std::string> fields,
-                                std::vector<std::string>& matchedFields);
-        void removeField(std::vector<std::string>& fields,
+                                std::vector<std::string> matchedFields);
+        void removeField(std::vector<std::string> fields,
                          std::string fieldToRemove);
         void printFields(WINDOW* stdscr, std::string userInput,
                          std::vector<std::string> matchedFields,
