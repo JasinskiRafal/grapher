@@ -5,6 +5,13 @@
 #include <vector>
 #include <string>
 
+typedef struct 
+{
+    int   min;
+    int   max;
+    float scale;
+} graphBounds;
+
 // A graph only graphs a single field and its values
 class Graph
 {
@@ -13,16 +20,19 @@ class Graph
               field);
         Graph();
 
-        //                    tuple<min, max, scale>
-        void adjustScale(std::tuple<int, int, float> domain,
-                         std::tuple<int, int, float> range);
+        void adjustScale(graphBounds domain,
+                         graphBounds range);
         void parseValues(std::vector<std::string> fieldvalues);
-        std::string getFieldname();
-        std::vector<int>   getX();
-        std::vector<float> getY();
+        std::string getFieldname() const;
+        std::vector<int>   getXvalues() const;
+        std::vector<float> getYvalues() const;
+        graphBounds        getDomain() const;
+        graphBounds        getRange() const;
     private:
         std::vector<int>   m_x;
         std::vector<float> m_y;
+        graphBounds        m_domain;
+        graphBounds        m_range;
         std::string               m_fieldname;
         std::vector<std::string>  m_fieldvalues;
 };
@@ -34,13 +44,14 @@ class GraphGroup
         GraphGroup(const GraphGroup& gGroup);
         GraphGroup(const Graph& g);
         GraphGroup();
-        //                    tuple<min, max, scale>
-        void adjustScale(std::tuple<int, int, float> domain,
-                         std::tuple<int, int, float> range);
+
+        void expandScale(graphBounds new_domain, graphBounds new_range);
         void removeGraph(std::string field);
-        const std::vector<Graph> getGraphs() const;
+        std::vector<Graph> getGraphs() const;
         // Grabs all of the fields in the group
-        std::vector<std::string> getAllFieldnames();
+        std::vector<std::string> getAllFieldnames() const;
+        graphBounds getDomain() const;
+        graphBounds getRange() const;
 
         //  Add fields from a graph into this one
         GraphGroup operator+=(const Graph& rhs);
@@ -48,8 +59,8 @@ class GraphGroup
         GraphGroup operator+=(const GraphGroup& rhs);
 
     private:
-        std::vector<int> m_shared_x;
-        std::vector<float> m_shared_y;
+        graphBounds m_domain;
+        graphBounds m_range;
         std::vector<Graph> m_graphs;
 };
 
