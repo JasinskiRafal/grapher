@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <charconv>
 
 #include "cli.hpp"
 #include "graph.hpp"
@@ -14,16 +13,24 @@ namespace plt = matplotlibcpp;
 Graph::Graph(std::pair<std::string, std::vector<std::string>> field)
     :m_fieldname(field.first), m_fieldvalues(field.second)
 {
+    // Populate our internal representation of value and scale 
+    this->parseValues(m_fieldvalues);
 }
 Graph::Graph() {}
 
+void Graph::draw() const
+{
+    // Draw our data
+    // TODO use matplotlib-cpp library here
+}
+
 std::vector<int> Graph::getXvalues() const
 {
-    return m_x;
+    return m_x_values;
 }
 std::vector<float> Graph::getYvalues() const
 {
-    return m_y;
+    return m_y_values;
 }
 
 std::string Graph::getFieldname() const
@@ -54,20 +61,26 @@ void Graph::parseValues(std::vector<std::string> fieldvalues)
     }
 
     // Parsing has succeeded
-    m_x = x_buf;
-    m_y = y_buf;
+    m_x_values = x_buf;
+    m_y_values = y_buf;
 
-    // TODO
+    // Note: Scale is hard coded to 1 for the meantime
     // Find domain min, max, and scale 
+    m_domain.min = *min_element(m_x_values.begin(), m_x_values.end());
+    m_domain.max = *max_element(m_x_values.begin(), m_x_values.end());
+    m_domain.scale = 1;
 
-    // TODO
     // Find range min, max, and scale
+    m_range.min = *min_element(m_y_values.begin(), m_y_values.end());
+    m_range.max = *max_element(m_y_values.begin(), m_y_values.end());
+    m_range.scale = 1;
 
 }
 
 ////////////////////////////////////
 // GraphGroup implementation
 ////////////////////////////////////
+
 // Copy constructor
 GraphGroup::GraphGroup(const GraphGroup& gGroup)
 {
@@ -105,6 +118,15 @@ void GraphGroup::removeGraph(std::string field)
         {
             m_graphs.erase(it);
         }
+    }
+}
+
+void GraphGroup::draw() const
+{
+    // Draw each graph in the group
+    for(auto const& g : m_graphs)
+    {
+        g.draw();
     }
 }
 

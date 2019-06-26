@@ -23,14 +23,15 @@ class Graph
         void adjustScale(graphBounds domain,
                          graphBounds range);
         void parseValues(std::vector<std::string> fieldvalues);
+        void draw() const;
         std::string getFieldname() const;
         std::vector<int>   getXvalues() const;
         std::vector<float> getYvalues() const;
         graphBounds        getDomain() const;
         graphBounds        getRange() const;
     private:
-        std::vector<int>   m_x;
-        std::vector<float> m_y;
+        std::vector<int>   m_x_values;
+        std::vector<float> m_y_values;
         graphBounds        m_domain;
         graphBounds        m_range;
         std::string               m_fieldname;
@@ -47,6 +48,7 @@ class GraphGroup
 
         void expandScale(graphBounds new_domain, graphBounds new_range);
         void removeGraph(std::string field);
+        void draw() const;
         std::vector<Graph> getGraphs() const;
         // Grabs all of the fields in the group
         std::vector<std::string> getAllFieldnames() const;
