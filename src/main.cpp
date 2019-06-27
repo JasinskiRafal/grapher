@@ -24,5 +24,18 @@ int main(int argc, char** argv)
     CLI cli;
     pickedFields = cli.getFieldsFromUser(allFields);
 
+    // Just grab the field off the front for testing
+    std::string fieldname = pickedFields.front();
+
+    auto field = std::make_pair (fieldname, logDb.getValuesOfField(fieldname));
+    // Graph the field
+    Graph g(field);
+    // Make the graph into a group
+    GraphGroup gG(g);
+    // Add the group to a window
+    Window w(gG);
+
+    w.draw();
+
     return 0;
 }

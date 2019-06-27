@@ -59,11 +59,15 @@ class GraphGroup
         GraphGroup operator+=(const Graph& rhs);
         //  Add the graphs from another graph group into this one
         GraphGroup operator+=(const GraphGroup& rhs);
+        
+        GraphGroup operator=(const GraphGroup& rhs);
 
     private:
         graphBounds m_domain;
         graphBounds m_range;
         std::vector<Graph> m_graphs;
 };
+
+
 
 #endif

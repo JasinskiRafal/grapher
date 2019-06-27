@@ -32,6 +32,8 @@ class CLI
 class Window
 {
     public:
+        Window(const GraphGroup& gGroup);
+        Window();
         void removeGraphGroup(int groupIdx);
         Window operator+=(const GraphGroup& rhs);
         void draw();

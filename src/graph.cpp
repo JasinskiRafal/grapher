@@ -21,7 +21,32 @@ Graph::Graph() {}
 void Graph::draw() const
 {
     // Draw our data
-    // TODO use matplotlib-cpp library here
+#ifdef DEBUG
+    std::cout << "x_values:";
+    for (auto const& val : m_x_values)
+    {
+        std::cout << val << ",";
+    }
+    std::cout << std::endl;
+
+    std::cout << "y_values:";
+    for (auto const& val : m_y_values)
+    {
+        std::cout << val << ",";
+    }
+    std::cout << std::endl;
+#endif
+    plt::plot(m_x_values, m_y_values);
+
+    // Show the name of the plot
+    plt::title(m_fieldname.data());
+
+    plt::xlim(m_domain.min, m_domain.max);
+    
+    plt::ylim(m_range.min, m_range.max);
+
+    plt::legend();
+    
 }
 
 std::vector<int> Graph::getXvalues() const
@@ -31,6 +56,16 @@ std::vector<int> Graph::getXvalues() const
 std::vector<float> Graph::getYvalues() const
 {
     return m_y_values;
+}
+
+graphBounds Graph::getDomain() const
+{
+    return m_domain;
+}
+
+graphBounds Graph::getRange() const
+{
+    return m_range;
 }
 
 std::string Graph::getFieldname() const
@@ -85,12 +120,14 @@ void Graph::parseValues(std::vector<std::string> fieldvalues)
 GraphGroup::GraphGroup(const GraphGroup& gGroup)
 {
     m_graphs = gGroup.m_graphs;
+    this->expandScale(gGroup.getDomain(), gGroup.getDomain());
 }
 
 // Construct group from a single graph 
 GraphGroup::GraphGroup(const Graph& g)
 {
-    m_graphs.push_back(g);
+    m_graphs = {g};
+    this->expandScale(g.getDomain(), g.getDomain());
 }
 
 GraphGroup::GraphGroup() { }
@@ -130,15 +167,6 @@ void GraphGroup::draw() const
     }
 }
 
-//  Add graph into the group
-GraphGroup GraphGroup::operator+=(const Graph& rhs)
-{ 
-    this->m_graphs.push_back(rhs);
-    // Expand our scale if needed
-    this->expandScale(rhs.getDomain(), rhs.getRange());
-    return (*this);
-}
-
 std::vector<Graph> GraphGroup::getGraphs() const
 {
     return m_graphs;
@@ -154,6 +182,16 @@ graphBounds GraphGroup::getRange() const
     return m_range;
 }
 
+
+//  Add graph into the group
+GraphGroup GraphGroup::operator+=(const Graph& rhs)
+{ 
+    this->m_graphs.push_back(rhs);
+    // Expand our scale if needed
+    this->expandScale(rhs.getDomain(), rhs.getRange());
+    return (*this);
+}
+
 GraphGroup GraphGroup::operator+=(const GraphGroup& rhs)
 { 
     //  Add another graph group into the group
@@ -164,5 +202,16 @@ GraphGroup GraphGroup::operator+=(const GraphGroup& rhs)
                           rhs_graphs.begin(), rhs_graphs.end());
     // Expand our scale if needed
     this->expandScale(rhs.getDomain(), rhs.getRange());
+    return (*this);
+}
+
+GraphGroup GraphGroup::operator=(const GraphGroup& rhs)
+{ 
+    this->m_graphs = rhs.getGraphs();
+    this->m_domain = rhs.getDomain();
+    this->m_range  = rhs.getRange();
+
+    this->expandScale(this->m_domain, this->m_range);
+
     return (*this);
 }
