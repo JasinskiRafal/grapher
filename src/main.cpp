@@ -4,7 +4,6 @@
 int main(int argc, char** argv)
 {
     std::vector<std::string> pickedFields;
-    std::vector<std::string> allFields;
 
     if (argc != 2)
     {
@@ -18,20 +17,13 @@ int main(int argc, char** argv)
     // Parse the CSV
     LogDatabase logDb = LogDatabase(file);
     // Get the fields from our database
-    allFields = logDb.getFieldnames();
     
-    // Figure out which fields the user wants to visualize
     CLI cli;
-    pickedFields = cli.getFieldsFromUser(allFields);
+    // Figure out which fields the user wants to visualize
+    pickedFields = cli.getFieldsFromUser(logDb.getFieldnames());
 
-    // Just grab the field off the front for testing
-    std::string fieldname = pickedFields.front();
-
-    auto field = std::make_pair (fieldname, logDb.getValuesOfField(fieldname));
-    // Graph the field
-    Graph g(field);
-    // Make the graph into a group
-    GraphGroup gG(g);
+    // Graph the chosen values from the database 
+    GraphGroup gG(pickedFields, logDb);
     // Add the group to a window
     Window w(gG);
 

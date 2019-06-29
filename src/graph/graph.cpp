@@ -1,9 +1,20 @@
 #include <algorithm>
 #include <numeric>
+#include <utility>
 
 #include "cli.hpp"
 #include "graph.hpp"
 #include "gnuplot-iostream.h"
+
+Gnuplot& operator<<(Gnuplot& gp, const Graph& g)
+{
+    //  Add our values to the plot
+//    gp << "plot" << gp.file1d(g.getYvalues()) << " with lines title '" +
+//         g.getFieldname() + "'" << std::endl;
+    gp << gp.file1d(g.getYvalues()) << " with lines title '" +
+         g.getFieldname() + "'";
+    return gp;
+}
 
 ////////////////////////////////////
 // Graph implementation
@@ -15,19 +26,6 @@ Graph::Graph(std::pair<std::string, std::vector<std::string>> field)
     this->parseValues(m_fieldvalues);
 }
 Graph::Graph() {}
-
-void Graph::draw() const
-{
-    Gnuplot gp;
-    // Set the y range to our domain min and max
-    gp << "set yrange [" + std::to_string(m_range.min) + ":" +
-                           std::to_string(m_range.max) + "]\n";
-
-    // Give the graph a title
-    gp << "plot '-' with lines title '" + m_fieldname + "'\n";
-
-    gp.send1d(m_y_values);
-}
 
 std::vector<int> Graph::getXvalues() const
 {
@@ -52,6 +50,15 @@ std::string Graph::getFieldname() const
 {
     return m_fieldname;
 }
+#if 0
+Gnuplot& Graph::operator<<(Gnuplot& gp)
+{
+    //  Add our values to the plot
+    gp << "plot" << gp.file1d(m_y_values) << " with lines title '" +
+         m_fieldname + "'" << std::endl;
+    return gp;
+}
+#endif
 
 void Graph::parseValues(std::vector<std::string> fieldvalues)
 {
@@ -100,6 +107,20 @@ void Graph::parseValues(std::vector<std::string> fieldvalues)
 // GraphGroup implementation
 ////////////////////////////////////
 
+GraphGroup::GraphGroup(std::vector<std::string> fields, LogDatabase& logDb)
+{
+    for (auto const& field : fields)
+    {
+        // Create a pair from the field and its values
+        // We must retrieve the values from the database
+        auto pair = std::make_pair(field, logDb.getValuesOfField(field));
+        m_graphs.push_back(pair);
+        // Adjust the shared scale
+        this->expandScale(m_graphs.back().getDomain(),
+                          m_graphs.back().getRange());
+    }
+}
+
 // Copy constructor
 GraphGroup::GraphGroup(const GraphGroup& gGroup)
 {
@@ -144,11 +165,23 @@ void GraphGroup::removeGraph(std::string field)
 
 void GraphGroup::draw() const
 {
+    Gnuplot gp;
+
+    // General multiplot setup
+    gp << "set title 'CSV Data'" << std::endl;
+
+    // We want our graphs stacked, 1 column wide
+//    gp << "set multiplot layout " << m_graphs.size() << ",1" << std::endl;
+    gp << "set multiplot" << std::endl;
+   
+    gp << "plot ";
     // Draw each graph in the group
     for(auto const& g : m_graphs)
     {
-        g.draw();
+        gp << g << ",";
     }
+    gp << " " << std::endl;
+    gp << "unset multiplot" << std::endl;
 }
 
 std::vector<Graph> GraphGroup::getGraphs() const

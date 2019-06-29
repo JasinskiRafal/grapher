@@ -5,12 +5,16 @@
 #include <vector>
 #include <string>
 
+#include "csv_logdb.hpp"
+#include "gnuplot-iostream.h"
+
 typedef struct 
 {
     int   min;
     int   max;
     float scale;
 } graphBounds;
+      
 
 // A graph only graphs a single field and its values
 class Graph
@@ -20,15 +24,14 @@ class Graph
               field);
         Graph();
 
-        void adjustScale(graphBounds domain,
-                         graphBounds range);
-        void parseValues(std::vector<std::string> fieldvalues);
-        void draw() const;
         std::string getFieldname() const;
         std::vector<int>   getXvalues() const;
         std::vector<float> getYvalues() const;
         graphBounds        getDomain() const;
         graphBounds        getRange() const;
+        // Used to stream graph data to gnuplot-iostream
+        //Gnuplot& operator<<(Gnuplot& os);
+        void parseValues(std::vector<std::string> fieldvalues);
     private:
         std::vector<int>   m_x_values;
         std::vector<float> m_y_values;
@@ -38,10 +41,15 @@ class Graph
         std::vector<std::string>  m_fieldvalues;
 };
 
+// Overload for streaming graph data into gnuplot-iostream
+Gnuplot& operator<<(Gnuplot& os, const Graph& g);
+
+
 // Combines multiple graphs, shares axes
 class GraphGroup
 {
     public:
+        GraphGroup(std::vector<std::string> fields, LogDatabase& logDb);
         GraphGroup(const GraphGroup& gGroup);
         GraphGroup(const Graph& g);
         GraphGroup();

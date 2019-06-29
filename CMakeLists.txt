@@ -26,12 +26,18 @@ add_library(csvparse ${csv_SRC})
 
 
 # Our actual binary executable is 'driver'
-file(GLOB exec_SRC "src/*.cpp")
-add_executable(driver ${exec_SRC})
-add_executable(debug_driver ${exec_SRC})
+file(GLOB cli_SRC "src/cli/*.cpp")
+file(GLOB graph_SRC "src/graph/*.cpp")
+file(GLOB main_SRC "src/main.cpp")
+set(driver_SRC ${cli_SRC} ${graph_SRC} ${main_SRC})
+
+add_executable(driver ${driver_SRC})
+add_executable(debug_driver ${driver_SRC})
 
 # Link ncurses since the CLI lib will need it
 # gnuplot-iostream requires Boost
 # The driver needs csvparse to take in csv files
-target_link_libraries(driver csvparse ncurses ${Boost_LIBRARIES}) 
-target_link_libraries(debug_driver csvparse ncurses ${Boost_LIBRARIES}) 
+set(driver_LIBS csvparse ncurses ${Boost_LIBRARIES})
+
+target_link_libraries(driver ${driver_LIBS}) 
+target_link_libraries(debug_driver ${driver_LIBS}) 
