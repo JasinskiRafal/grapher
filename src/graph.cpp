@@ -1,11 +1,9 @@
 #include <algorithm>
+#include <numeric>
 
 #include "cli.hpp"
 #include "graph.hpp"
-#include "matplotlibcpp.h"
-
-namespace plt = matplotlibcpp;
-
+#include "gnuplot-iostream.h"
 
 ////////////////////////////////////
 // Graph implementation
@@ -20,6 +18,10 @@ Graph::Graph() {}
 
 void Graph::draw() const
 {
+    Gnuplot gp;
+    // Buffer for our gnuplot commmands
+    std::string gp_cmd;
+
     // Draw our data
 #ifdef DEBUG
     std::cout << "x_values:";
@@ -28,7 +30,7 @@ void Graph::draw() const
         std::cout << val << ",";
     }
     std::cout << std::endl;
-
+    
     std::cout << "y_values:";
     for (auto const& val : m_y_values)
     {
@@ -36,17 +38,15 @@ void Graph::draw() const
     }
     std::cout << std::endl;
 #endif
-    plt::plot(m_x_values, m_y_values);
 
-    // Show the name of the plot
-    plt::title(m_fieldname.data());
+    // Set the x range to our domain min and max
+    gp_cmd = "set yrange [" + std::to_string(m_range.min) + ":" +
+                              std::to_string(m_range.max) + "]\n";
+    gp << gp_cmd;
+    gp_cmd = "plot '-' with lines title '" + m_fieldname + "'\n";
+    gp << gp_cmd;
 
-    plt::xlim(m_domain.min, m_domain.max);
-    
-    plt::ylim(m_range.min, m_range.max);
-
-    plt::legend();
-    
+    gp.send1d(m_y_values);
 }
 
 std::vector<int> Graph::getXvalues() const
