@@ -5,7 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/include/**",
-                "${workspaceFolder}/libraries/matplotlib-cpp/**"
+                "${workspaceFolder}/libraries/gnuplot-iostream/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",

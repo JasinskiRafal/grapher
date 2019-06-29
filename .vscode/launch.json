@@ -9,7 +9,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/cli",
+            "program": "${workspaceFolder}/build/debug_driver",
             "args": ["test/Sacramentorealestatetransactions.csv"],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",

@@ -19,32 +19,12 @@ Graph::Graph() {}
 void Graph::draw() const
 {
     Gnuplot gp;
-    // Buffer for our gnuplot commmands
-    std::string gp_cmd;
+    // Set the y range to our domain min and max
+    gp << "set yrange [" + std::to_string(m_range.min) + ":" +
+                           std::to_string(m_range.max) + "]\n";
 
-    // Draw our data
-#ifdef DEBUG
-    std::cout << "x_values:";
-    for (auto const& val : m_x_values)
-    {
-        std::cout << val << ",";
-    }
-    std::cout << std::endl;
-    
-    std::cout << "y_values:";
-    for (auto const& val : m_y_values)
-    {
-        std::cout << val << ",";
-    }
-    std::cout << std::endl;
-#endif
-
-    // Set the x range to our domain min and max
-    gp_cmd = "set yrange [" + std::to_string(m_range.min) + ":" +
-                              std::to_string(m_range.max) + "]\n";
-    gp << gp_cmd;
-    gp_cmd = "plot '-' with lines title '" + m_fieldname + "'\n";
-    gp << gp_cmd;
+    // Give the graph a title
+    gp << "plot '-' with lines title '" + m_fieldname + "'\n";
 
     gp.send1d(m_y_values);
 }
@@ -77,10 +57,13 @@ void Graph::parseValues(std::vector<std::string> fieldvalues)
 {
     // Buffer input so we don't add to our class variables if we get
     // an exception
-    std::vector<float> y_buf(fieldvalues.size());
-    std::vector<int>   x_buf(fieldvalues.size());
+    // We will be iteratively appending to this
+    std::vector<float> y_buf = {};
+
     // Fill x axis with ascending values
+    std::vector<int>   x_buf(fieldvalues.size());
     std::iota(x_buf.begin(), x_buf.end(), 0);
+
     std::string::size_type size;
     float y_max = 0.0, y_min = 0.0;
 
@@ -90,6 +73,7 @@ void Graph::parseValues(std::vector<std::string> fieldvalues)
         try {
             y_buf.push_back(stof(str, &size));
         } catch (std::invalid_argument e) {
+            std::cout << "Could not parse:" << str << std::endl;
             return; // Could not parse float
         }
         
