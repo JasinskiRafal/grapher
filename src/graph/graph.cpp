@@ -170,17 +170,20 @@ void GraphGroup::draw() const
     // General multiplot setup
     gp << "set title 'CSV Data'" << std::endl;
 
-    // We want our graphs stacked, 1 column wide
-//    gp << "set multiplot layout " << m_graphs.size() << ",1" << std::endl;
+    // Allow for our data to share axes
     gp << "set multiplot" << std::endl;
    
     gp << "plot ";
     // Draw each graph in the group
-    for(auto const& g : m_graphs)
+    for(auto const& graph : m_graphs)
     {
-        gp << g << ",";
+        // Stream the data from each graph
+        gp << graph << ",";
     }
+    // Add a space and newline at the end
     gp << " " << std::endl;
+
+    // This triggers the gnuplot window to pop up
     gp << "unset multiplot" << std::endl;
 }
 
