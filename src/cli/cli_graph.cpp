@@ -27,9 +27,19 @@ void Window::removeGraphGroup(int groupIdx)
 
 void Window::draw()
 {
+    // The gnuplot is shared among the graph groups in this window
+    Gnuplot gp;
+
     // Call on each of the groups to draw their graphs
     for (auto const& gGroup : m_graphGroups)
     {
-        gGroup.draw();
+        gGroup.draw(gp);
+    }
+
+    // Let the user keep the window open as long as they want
+    for (;;)
+    {
+        gp << "pause 1" << std::endl;
+        gp << "reread" << std::endl;
     }
 }

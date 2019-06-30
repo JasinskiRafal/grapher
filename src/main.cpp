@@ -1,3 +1,6 @@
+#include <thread>
+#include <chrono>
+
 #include "cli.hpp"
 #include "csv_logdb.hpp"
 
@@ -27,6 +30,9 @@ int main(int argc, char** argv)
     // Add the group to a window
     Window w(gG);
 
+    /* TODO Make .draw() this into its own thread, 
+       listen for command line user input in
+       the main thread */
     w.draw();
 
     return 0;

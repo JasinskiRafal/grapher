@@ -163,16 +163,14 @@ void GraphGroup::removeGraph(std::string field)
     }
 }
 
-void GraphGroup::draw() const
+void GraphGroup::draw(Gnuplot& gp) const
 {
-    Gnuplot gp;
 
     // General multiplot setup
     gp << "set title 'CSV Data'" << std::endl;
 
     // Allow for our data to share axes
     gp << "set multiplot" << std::endl;
-   
     gp << "plot ";
     // Draw each graph in the group
     for(auto const& graph : m_graphs)
@@ -183,6 +181,7 @@ void GraphGroup::draw() const
     // Add a space and newline at the end
     gp << " " << std::endl;
 
+    gp << "set mouse" << std::endl;
     // This triggers the gnuplot window to pop up
     gp << "unset multiplot" << std::endl;
 }

@@ -56,7 +56,7 @@ class GraphGroup
 
         void expandScale(graphBounds new_domain, graphBounds new_range);
         void removeGraph(std::string field);
-        void draw() const;
+        void draw(Gnuplot& gp) const;
         std::vector<Graph> getGraphs() const;
         // Grabs all of the fields in the group
         std::vector<std::string> getAllFieldnames() const;
