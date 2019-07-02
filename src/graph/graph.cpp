@@ -107,7 +107,8 @@ void Graph::parseValues(std::vector<std::string> fieldvalues)
 // GraphGroup implementation
 ////////////////////////////////////
 
-GraphGroup::GraphGroup(std::vector<std::string> fields, LogDatabase& logDb)
+GraphGroup::GraphGroup(std::vector<std::string> fields,
+                       LogDatabase& logDb)
 {
     for (auto const& field : fields)
     {

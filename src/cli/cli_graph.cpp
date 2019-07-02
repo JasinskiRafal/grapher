@@ -1,8 +1,20 @@
 #include "cli.hpp"
 
+void drawWindow(Window w)
+{
+    w.draw();
+}
+
+
 ////////////////////////////////////
 // Window implementation
 ////////////////////////////////////
+
+// Construct a window from some fields and the log database
+Window::Window(std::vector<std::string> fields, LogDatabase& logDb)
+{
+    m_graphGroups = {GraphGroup(fields, logDb)};
+}
 
 // Copy constructor
 Window::Window(const GraphGroup& gGroup)

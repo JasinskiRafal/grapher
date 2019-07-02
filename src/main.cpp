@@ -24,16 +24,14 @@ int main(int argc, char** argv)
     CLI cli;
     // Figure out which fields the user wants to visualize
     pickedFields = cli.getFieldsFromUser(logDb.getFieldnames());
+    
+    // TODO Create as many output windows as the user wants
+    std::thread outputWindow(drawWindow, Window(pickedFields, logDb));
+        
+    pickedFields = cli.getFieldsFromUser(logDb.getFieldnames());
 
-    // Graph the chosen values from the database 
-    GraphGroup gG(pickedFields, logDb);
-    // Add the group to a window
-    Window w(gG);
-
-    /* TODO Make .draw() this into its own thread, 
-       listen for command line user input in
-       the main thread */
-    w.draw();
+    outputWindow.join();
+    
 
     return 0;
 }
