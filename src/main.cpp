@@ -25,13 +25,9 @@ int main(int argc, char** argv)
     // Figure out which fields the user wants to visualize
     pickedFields = cli.getFieldsFromUser(logDb.getFieldnames());
     
-    // TODO Create as many output windows as the user wants
     std::thread outputWindow(drawWindow, Window(pickedFields, logDb));
-        
-    pickedFields = cli.getFieldsFromUser(logDb.getFieldnames());
 
     outputWindow.join();
-    
 
     return 0;
 }

@@ -1,0 +1,22 @@
+Requirements
+2 Threads: one for the command line interface and another for the graphing output
+------------------------
+Command Line Interface
+    - Constantly exists on the console, updating the selected fields based on input
+    - An update of selection triggers a redraw of the graphing output window
+    - User shall be able to see the selected values and available values from the
+        most recently drawn graph
+    - User shall be able to add or remove values as they wish
+        -- Note: Add/remove based on key binding or based on keyword?
+    - User shall be able to choose which fields to graph together on the same axes
+------------------------
+Graphing output window
+    - From initial selection, can persist as long as the user desires until they close it
+    - Whenever CLI thread has picked a new subset of fields, redraw the graph
+------------------------
+Shared information between the two threads
+    - CLI shall be able to spawn a new graph at any point
+    - CLI shall share the fields and field values on graph window creation
+        -- Note: No need for the window thread to figure out how to undo/redo
+                 aspects of the graph. It can just draw the graph as if it is
+                 creating it for the first time.
