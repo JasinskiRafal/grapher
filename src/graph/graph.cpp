@@ -20,9 +20,10 @@ Gnuplot& operator<<(Gnuplot& gp, const Graph& g)
 // Graph implementation
 ////////////////////////////////////
 Graph::Graph(std::pair<std::string, std::vector<std::string>> field)
-    :m_fieldname(field.first), m_fieldvalues(field.second)
 {
     // Populate our internal representation of value and scale 
+    m_fieldname = field.first;
+    m_fieldvalues = field.second;
     this->parseValues(m_fieldvalues);
 }
 Graph::Graph() {}
@@ -50,15 +51,6 @@ std::string Graph::getFieldname() const
 {
     return m_fieldname;
 }
-#if 0
-Gnuplot& Graph::operator<<(Gnuplot& gp)
-{
-    //  Add our values to the plot
-    gp << "plot" << gp.file1d(m_y_values) << " with lines title '" +
-         m_fieldname + "'" << std::endl;
-    return gp;
-}
-#endif
 
 void Graph::parseValues(std::vector<std::string> fieldvalues)
 {

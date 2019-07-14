@@ -28,22 +28,4 @@ class CLI
         std::vector<Graph> m_graphs;
 };
 
-
-// Combines multiple graph groups, each with independent axes
-class Window
-{
-    public:
-        Window(const GraphGroup& gGroup);
-        Window(std::vector<std::string> fields, LogDatabase& logDb);
-        Window();
-        void removeGraphGroup(int groupIdx);
-        Window operator+=(const GraphGroup& rhs);
-        void draw();
-    private:
-        std::vector<GraphGroup> m_graphGroups;
-};
-
-// Non member function used for spawning a thread
-void drawWindow(Window w);
-
 #endif

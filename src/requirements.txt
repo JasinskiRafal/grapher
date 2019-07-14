@@ -15,8 +15,15 @@ Graphing output window
     - Whenever CLI thread has picked a new subset of fields, redraw the graph
 ------------------------
 Shared information between the two threads
-    - CLI shall be able to spawn a new graph at any point
-    - CLI shall share the fields and field values on graph window creation
+    - CLI Input:
+        -- (From user) Fields that the user wants to see
+    - CLI Output:
+        -- (To graphing window) Fields that the user has chosen
+    --------------------
+    - Graph Input:
+        -- (From CLI) Fields that the user has chosen
+    - Graph Output:
+        -- A GNUplot graph
         -- Note: No need for the window thread to figure out how to undo/redo
                  aspects of the graph. It can just draw the graph as if it is
                  creating it for the first time.

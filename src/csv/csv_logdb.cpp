@@ -67,3 +67,8 @@ std::vector<std::string> LogDatabase::getFieldnames()
     // Get all the keys out of the unordered_map
     return getKeys(m_logMap);
 }
+
+fieldMap LogDatabase::getFieldMap()
+{
+    return m_logMap;
+}

@@ -9,6 +9,9 @@
 #include <iterator>
 #include <unordered_map>
 
+// This is going to be the standard data type for storing fields and their values
+using fieldMap = std::unordered_map<std::string, std::vector<std::string>>;
+
 // Declared outside of class for general use with unordered maps
 template <class T, class R>
 std::vector<T> getKeys(std::unordered_map<T, R> map)
@@ -23,6 +26,7 @@ std::vector<T> getKeys(std::unordered_map<T, R> map)
     return v;
 }
 
+
 class LogDatabase
 {
     public:
@@ -31,8 +35,8 @@ class LogDatabase
         void parseFile(std::string filename);
         std::vector<std::string> getValuesOfField(std::string fieldname);
         std::vector<std::string> getFieldnames();
+        fieldMap getFieldMap();
     private:
-        std::unordered_map<
-            std::string, std::vector<std::string>> m_logMap;
+        fieldMap m_logMap;
 };
 #endif

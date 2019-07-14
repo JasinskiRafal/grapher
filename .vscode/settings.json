@@ -61,5 +61,6 @@
         "string": "cpp",
         "thread": "cpp",
         "iomanip": "cpp"
-    }
+    },
+    "C_Cpp.configurationWarnings": "Disabled"
 }

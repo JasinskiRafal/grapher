@@ -19,13 +19,14 @@ int main(int argc, char** argv)
    
     // Parse the CSV
     LogDatabase logDb = LogDatabase(file);
-    // Get the fields from our database
     
-    CLI cli;
     // Figure out which fields the user wants to visualize
+    CLI cli;
     pickedFields = cli.getFieldsFromUser(logDb.getFieldnames());
-    
-    std::thread outputWindow(drawWindow, Window(pickedFields, logDb));
+
+    Window w(pickedFields, logDb);
+    // Make a thread of outputWindow()
+    std::thread outputWindow(drawWindow, w);
 
     outputWindow.join();
 
