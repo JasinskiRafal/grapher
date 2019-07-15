@@ -10,7 +10,7 @@
 #include <unordered_map>
 
 // This is going to be the standard data type for storing fields and their values
-using fieldMap = std::unordered_map<std::string, std::vector<std::string>>;
+using FieldMap = std::unordered_map<std::string, std::vector<std::string>>;
 
 // Declared outside of class for general use with unordered maps
 template <class T, class R>
@@ -33,10 +33,10 @@ class LogDatabase
         LogDatabase(std::string filename);
         LogDatabase();
         void parseFile(std::string filename);
-        std::vector<std::string> getValuesOfField(std::string fieldname);
-        std::vector<std::string> getFieldnames();
-        fieldMap getFieldMap();
+        std::vector<std::string> getValuesOfField(std::string fieldname) const;
+        const std::vector<std::string> getFieldnames() const;
+        FieldMap getFieldMap() const;
     private:
-        fieldMap m_logMap;
+        FieldMap m_logMap;
 };
 #endif

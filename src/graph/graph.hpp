@@ -49,7 +49,7 @@ Gnuplot& operator<<(Gnuplot& os, const Graph& g);
 class GraphGroup
 {
     public:
-        GraphGroup(std::vector<std::string> fields, LogDatabase& logDb);
+        GraphGroup(FieldMap fieldMap);
         GraphGroup(const GraphGroup& gGroup);
         GraphGroup(const Graph& g);
         GraphGroup();
@@ -82,7 +82,7 @@ class Window
 {
     public:
         Window(const GraphGroup& gGroup);
-        Window(std::vector<std::string> fields, LogDatabase& logDb);
+        Window(FieldMap fieldMap);
         Window();
         void removeGraphGroup(int groupIdx);
         Window operator+=(const GraphGroup& rhs);

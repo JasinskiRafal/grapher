@@ -11,9 +11,9 @@ void drawWindow(Window w)
 ////////////////////////////////////
 
 // Construct a window from some fields and the log database
-Window::Window(std::vector<std::string> fields, LogDatabase& logDb)
+Window::Window(FieldMap fieldMap)
 {
-    m_graphGroups = {GraphGroup(fields, logDb)};
+    m_graphGroups = {GraphGroup(fieldMap)};
 }
 
 // Copy constructor

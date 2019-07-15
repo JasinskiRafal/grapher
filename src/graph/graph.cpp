@@ -99,15 +99,12 @@ void Graph::parseValues(std::vector<std::string> fieldvalues)
 // GraphGroup implementation
 ////////////////////////////////////
 
-GraphGroup::GraphGroup(std::vector<std::string> fields,
-                       LogDatabase& logDb)
+GraphGroup::GraphGroup(FieldMap fieldMap)
 {
-    for (auto const& field : fields)
+    for (auto const& pair : fieldMap)
     {
-        // Create a pair from the field and its values
-        // We must retrieve the values from the database
-        auto pair = std::make_pair(field, logDb.getValuesOfField(field));
-        m_graphs.push_back(pair);
+        // Construct a graph from the field,fieldvalues pair
+        m_graphs.push_back(Graph(pair));
         // Adjust the shared scale
         this->expandScale(m_graphs.back().getDomain(),
                           m_graphs.back().getRange());

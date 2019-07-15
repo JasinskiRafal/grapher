@@ -6,7 +6,7 @@
 
 int main(int argc, char** argv)
 {
-    std::vector<std::string> pickedFields;
+    FieldMap pickedFields;
 
     if (argc != 2)
     {
@@ -21,10 +21,10 @@ int main(int argc, char** argv)
     LogDatabase logDb = LogDatabase(file);
     
     // Figure out which fields the user wants to visualize
-    CLI cli;
-    pickedFields = cli.getFieldsFromUser(logDb.getFieldnames());
+    CLI cli(logDb);
+    pickedFields = cli.getFieldsFromUser();
 
-    Window w(pickedFields, logDb);
+    Window w(pickedFields);
     // Make a thread of outputWindow()
     std::thread outputWindow(drawWindow, w);
 

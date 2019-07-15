@@ -9,25 +9,52 @@ void signalHandler(int signum)
 /////////////////////////////////////////////
 // CLI implemenation
 /////////////////////////////////////////////
-void CLI::updateMatchedFields(std::string userInput,
-                         std::vector<std::string> fields,
-                         std::vector<std::string>& matchedFields)
+
+CLI::CLI(const LogDatabase logDb) 
+    : m_allFields(logDb.getFieldnames()), m_fieldMap(logDb.getFieldMap())
 {
-    matchedFields.clear(); // Start from scratch
-    for (int i = 0; i < fields.size(); i++)
-    {
-        std::size_t found = fields[i].find(userInput);
-        // If userInput is a substring of a fields, it's a possible choice
-        if (found != std::string::npos)
-            matchedFields.push_back(fields[i]);
-    }
+    m_pickedFields = {};
+    m_unpickedFields.reserve(m_allFields.size());
+
+    // All of the fields are unpicked on construction
+    std::transform(m_allFields.begin(), m_allFields.end(),
+                   back_inserter(m_unpickedFields),
+    [] (std::string const & field)
+        {
+            // Transform each std::string to a string_view
+            return field.c_str();
+        });
+    // We have no user input yet, so all the unpicked fields can be matched
+    // to the empty string
+    m_matchedFields = m_unpickedFields;
 }
 
-void CLI::removeField(std::vector<std::string>& fields,
-                      std::string fieldToRemove)
+std::vector<std::string_view> CLI::fuzzySearchFields(std::string userInput)
+{
+    // This function will return all the fields in <fields> if <userInput> is
+    // a substring of a field in <fields>
+    std::vector<std::string_view> searchResults;
+
+    for (int i = 0; i < m_unpickedFields.size(); i++)
+    {
+        // Search this fieldname with userInput as a substring
+        std::size_t found = m_unpickedFields[i].find(userInput);
+        if (found != std::string::npos)
+        {
+            // userInput is a substring of a fields, it's a possible choice
+            searchResults.push_back(m_unpickedFields[i]);
+        }
+    }
+
+    return searchResults;
+}
+
+void CLI::removeField(std::vector<std::string_view>& fields,
+                      std::string_view fieldToRemove)
 {
     for (auto it = fields.begin(); it != fields.end();)
     {
+        // We are compaing a string_view to string
         if (*it == fieldToRemove)
         {
             fields.erase(it);
@@ -40,29 +67,28 @@ void CLI::removeField(std::vector<std::string>& fields,
     }
 }
 
-void CLI::printFields(WINDOW* stdscr, std::string userInput,
-                             std::vector<std::string> matchedFields,
-                             std::vector<std::string> pickedFields)
+void CLI::printFields(WINDOW* stdscr, std::string userInput) const
 {
     addstr("Available fields:\n");
-    for (auto const& m : matchedFields)
+    for (auto const& m : m_matchedFields)
     {
         // Print out all the choices
-        addstr((m + "\n").c_str());
+        addstr(m.data());
+        addstr("\n");
     }
     addstr("---------\n");
     addstr("Selected:\n");
-    for (auto const& p : pickedFields)
+    for (auto const& p : m_pickedFields)
     {
         // Print out all the choices
-        addstr((p + "\n").c_str());
+        addstr(p.data());
+        addstr("\n");
     }
     addstr("---------\n");
     addstr((userInput + "\n").c_str());
 }
 
-std::vector<std::string>
-    CLI::getFieldsFromUser(std::vector<std::string> fields)
+FieldMap CLI::getFieldsFromUser()
 {
     signal(SIGINT, signalHandler);
     initscr();
@@ -71,13 +97,7 @@ std::vector<std::string>
     cbreak();
     int ch;
     std::string userInput;
-    // Empty input matches all fields
-    std::vector<std::string> matchedFields = fields;
-    // Fields user hasn't picked
-    std::vector<std::string> unpickedFields = fields;
-    // User has picked these
-    std::vector<std::string> pickedFields;
-    printFields(stdscr, userInput, matchedFields, pickedFields);
+    printFields(stdscr, userInput);
     for (;;)
     {
         // Let the user narrow down the fields until
@@ -88,45 +108,62 @@ std::vector<std::string>
 
             case KEY_BACKSPACE:
             case 127:
+            /* User has removed a character -----*/
                 if (userInput.size() > 0)
                     userInput.pop_back();
-                updateMatchedFields(userInput, unpickedFields, matchedFields);
+                m_matchedFields = fuzzySearchFields(userInput);
                 break;
             case KEY_ENTER:
             case 36:
             case 10:
+            /* User has pressed enter ---------- */
                 if (userInput.empty())
                 {   // User is done making choices
                     clear();
                     endwin();
-                    return pickedFields;
+                    return fieldsToFieldMap(m_pickedFields);
                 }
-                else if(matchedFields.size() == 1)
+                else if(m_matchedFields.size() == 1)
                 {
                     // User chose a field
-                    pickedFields.push_back(matchedFields.front());
+                    m_pickedFields.push_back(m_matchedFields.front());
                     // Remove it from our unpicked fields
-                    removeField(unpickedFields, matchedFields.front());
+                    removeField(m_unpickedFields, m_matchedFields.front());
                     userInput.clear(); // Clear our input
-                    matchedFields = unpickedFields;
+                    m_matchedFields = m_unpickedFields;
                 }
                 else
                 {
                     // Invalid choice
                     userInput.clear();
-                    matchedFields = unpickedFields; // Our input is clear
+                    m_matchedFields = m_unpickedFields; // Our input is clear
                 }
                 break;
             default:
+            /* User has pressed any key other
+               than ENTER or BACKSPACE ---------- */
                 userInput += static_cast<char>(ch);
-                updateMatchedFields(userInput, unpickedFields, matchedFields);
+                m_matchedFields = fuzzySearchFields(userInput);
                 break;
         } // End of switch(ch)
 
-				clear();
+        clear();
         // Print every cycle
-        printFields(stdscr, userInput, matchedFields, pickedFields);
+        printFields(stdscr, userInput);
 
     } // End of for (;;)
 
+}
+
+FieldMap CLI::fieldsToFieldMap(const std::vector<std::string_view> fields)
+{
+    FieldMap fm;
+    for (const std::string_view s_view : fields)
+    {
+        // Need to convert string_view to string when using the FieldMap
+        std::string s(s_view);
+        fm[s] = m_fieldMap.at(s);
+    }
+
+    return fm;
 }
