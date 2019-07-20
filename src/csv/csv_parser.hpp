@@ -15,6 +15,9 @@
 /////////////////////////////////////////////
 // CSVRow class
 /////////////////////////////////////////////
+/**
+ * @brief A single row in a CSV file. Given an inputstream, it can read to the next row
+ */
 class CSVRow
 {
     public:
@@ -32,13 +35,21 @@ std::istream& operator>>(std::istream& str, CSVRow& data);
 /////////////////////////////////////////////
 // CSVIterator class
 /////////////////////////////////////////////
+/**
+ * @brief A class for iterating through an entire CSV file.
+ */
 class CSVIterator
 {
     public:
+        /** @brief Allows the class to be used as an iterator */
         typedef std::input_iterator_tag     iterator_category;
+        /** @brief The value we are iterating over is CSV rows */
         typedef CSVRow                      value_type;
+        /** @brief Needed for satisfying iterator traits */
         typedef std::size_t                 difference_type;
+        /** @brief Needed for satisfying iterator traits */
         typedef CSVRow*                     pointer;
+        /** @brief Needed for satisfying iterator traits */
         typedef CSVRow&                     reference;
 
         CSVIterator(std::istream& str);

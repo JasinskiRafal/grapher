@@ -8,20 +8,28 @@
 #include "csv_logdb.hpp"
 #include "gnuplot-iostream.h"
 
+/**
+ * @brief Used for describing the domain and range of a graph along
+ * with its scaling
+ */
 typedef struct 
 {
+    /** @brief the lower bound of domain or range */
     int   min;
+    /** @brief the upper bound of domain or range */
     int   max;
+    /** @brief the scale of the domain or range. The space between ticks */
     float scale;
 } graphBounds;
       
 
-// A graph only graphs a single field and its values
+/**
+ * @brief A graph only graphs a single field and its values
+ */
 class Graph
 {
     public:
-        Graph(std::pair<std::string, std::vector<std::string>>
-              field);
+        Graph(const FieldPair& field);
         Graph();
 
         std::string getFieldname() const;
@@ -31,7 +39,7 @@ class Graph
         graphBounds        getRange() const;
         // Used to stream graph data to gnuplot-iostream
         //Gnuplot& operator<<(Gnuplot& os);
-        void parseValues(std::vector<std::string> fieldvalues);
+        void parseValues(const std::vector<std::string>& fieldvalues);
     private:
         std::vector<int>   m_x_values;
         std::vector<float> m_y_values;
@@ -45,21 +53,22 @@ class Graph
 Gnuplot& operator<<(Gnuplot& os, const Graph& g);
 
 
-// Combines multiple graphs, shares axes
+/**
+ * @brief Combines multiple graphs, shares axes
+ */
 class GraphGroup
 {
     public:
-        GraphGroup(FieldMap fieldMap);
+        GraphGroup(const FieldMap& fieldMap);
         GraphGroup(const GraphGroup& gGroup);
         GraphGroup(const Graph& g);
         GraphGroup();
 
-        void expandScale(graphBounds new_domain, graphBounds new_range);
-        void removeGraph(std::string field);
+        void expandScale(const graphBounds new_domain,
+                         const graphBounds new_range);
+        void removeGraph(const std::string& field);
         void draw(Gnuplot& gp) const;
         std::vector<Graph> getGraphs() const;
-        // Grabs all of the fields in the group
-        std::vector<std::string> getAllFieldnames() const;
         graphBounds getDomain() const;
         graphBounds getRange() const;
 
@@ -76,22 +85,24 @@ class GraphGroup
         std::vector<Graph> m_graphs;
 };
 
-
-// Combines multiple graph groups, each with independent axes
+/**
+ * @brief Combines multiple graph groups, each with independent axes
+ */
 class Window
 {
     public:
         Window(const GraphGroup& gGroup);
-        Window(FieldMap fieldMap);
+        Window(const FieldMap& fieldMap);
         Window();
-        void removeGraphGroup(int groupIdx);
+        void replaceFields(const FieldMap& fieldMap);
+        void removeGraphGroup(const int groupIdx);
         Window operator+=(const GraphGroup& rhs);
         void draw();
     private:
         std::vector<GraphGroup> m_graphGroups;
 };
 
-// Non member function used for spawning a thread
+/** @brief Non member function used for spawning a thread */
 void drawWindow(Window w);
 
 

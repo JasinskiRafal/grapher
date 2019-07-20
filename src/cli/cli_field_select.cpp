@@ -1,5 +1,10 @@
 #include "cli.hpp"
 
+/**
+ * @brief Ends ncurses session when a <signum> signal is sent
+ * 
+ * @param[in] signum - number of signal to handle
+ */
 void signalHandler(int signum)
 {
     endwin();
@@ -10,7 +15,13 @@ void signalHandler(int signum)
 // CLI implemenation
 /////////////////////////////////////////////
 
-CLI::CLI(const LogDatabase logDb) 
+/**
+ * @brief Construct a command line interface to let the user interact
+ * with the log database
+ * 
+ * @param[in] logDb - The log data to interact with
+ */
+CLI::CLI(const LogDatabase& logDb) 
     : m_allFields(logDb.getFieldnames()), m_fieldMap(logDb.getFieldMap())
 {
     m_pickedFields = {};
@@ -29,7 +40,16 @@ CLI::CLI(const LogDatabase logDb)
     m_matchedFields = m_unpickedFields;
 }
 
-std::vector<std::string_view> CLI::fuzzySearchFields(std::string userInput)
+/**
+ * @brief Search our unpicked fields to see if <userInput> is a substring
+ * of any string in the vector of unpicked fields
+ * 
+ * @param[in] userInput - The substring to search for
+ * @return std::vector<std::string_view> - Vector of values where <userInput>
+ * is a substring
+ */
+std::vector<std::string_view>
+CLI::fuzzySearchFields(const std::string& userInput)
 {
     // This function will return all the fields in <fields> if <userInput> is
     // a substring of a field in <fields>
@@ -49,8 +69,14 @@ std::vector<std::string_view> CLI::fuzzySearchFields(std::string userInput)
     return searchResults;
 }
 
+/**
+ * @brief Given a vector of fields, remove a field from it
+ * 
+ * @param[out] fields - The vector of fields to remove <fieldToRemove> from
+ * @param[in] fieldToRemove - The field to remove from <field>
+ */
 void CLI::removeField(std::vector<std::string_view>& fields,
-                      std::string_view fieldToRemove)
+                      const std::string_view& fieldToRemove)
 {
     for (auto it = fields.begin(); it != fields.end();)
     {
@@ -67,7 +93,14 @@ void CLI::removeField(std::vector<std::string_view>& fields,
     }
 }
 
-void CLI::printFields(WINDOW* stdscr, std::string userInput) const
+/**
+ * @brief Print the user's input, fields that the input is a substring of,
+ * and fields that the user has already picked. Prints via ncurses.
+ * 
+ * @param[in] stdscr - used for ncurses output
+ * @param[in] userInput - Printed out along with matched/picked fields
+ */
+void CLI::printFields(WINDOW* stdscr, const std::string& userInput) const
 {
     addstr("Available fields:\n");
     for (auto const& m : m_matchedFields)
@@ -88,6 +121,12 @@ void CLI::printFields(WINDOW* stdscr, std::string userInput) const
     addstr((userInput + "\n").c_str());
 }
 
+/**
+ * @brief Prompts the user for input and tells the user what fields
+ * are available to be picked.
+ * 
+ * @return FieldMap - The fields the user has picked
+ */
 FieldMap CLI::getFieldsFromUser()
 {
     signal(SIGINT, signalHandler);
@@ -155,7 +194,14 @@ FieldMap CLI::getFieldsFromUser()
 
 }
 
-FieldMap CLI::fieldsToFieldMap(const std::vector<std::string_view> fields)
+/**
+ * @brief Converts a vector of fields (which is just the names) to a FieldMap
+ * which includes the values of the fields as well
+ * 
+ * @param[in] fields - Vector of field names
+ * @return FieldMap - Field names and values
+ */
+FieldMap CLI::fieldsToFieldMap(const std::vector<std::string_view>& fields)
 {
     FieldMap fm;
     for (const std::string_view s_view : fields)

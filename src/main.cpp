@@ -1,5 +1,4 @@
-#include <thread>
-#include <chrono>
+#include <thread> 
 
 #include "cli.hpp"
 #include "csv_logdb.hpp"
@@ -22,13 +21,22 @@ int main(int argc, char** argv)
     
     // Figure out which fields the user wants to visualize
     CLI cli(logDb);
+    Window w;
+
+    // Grab the first round of fields
     pickedFields = cli.getFieldsFromUser();
+    w.replaceFields(pickedFields);
 
-    Window w(pickedFields);
-    // Make a thread of outputWindow()
-    std::thread outputWindow(drawWindow, w);
+    for (;;)
+    {
+        std::thread output(drawWindow, w);
+        // Get input for next round
+        pickedFields = cli.getFieldsFromUser();
+        // End the output window thread since we must redraw
+        output.join();
+        w.replaceFields(pickedFields);
+    }
 
-    outputWindow.join();
 
     return 0;
 }

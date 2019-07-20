@@ -8,11 +8,21 @@
 #include <vector>
 #include <iterator>
 #include <unordered_map>
+#include <utility>
 
 // This is going to be the standard data type for storing fields and their values
-using FieldMap = std::unordered_map<std::string, std::vector<std::string>>;
+using FieldMap  = std::unordered_map<std::string, std::vector<std::string>>;
+using FieldPair = std::pair<std::string, std::vector<std::string>>;
 
 // Declared outside of class for general use with unordered maps
+/**
+ * @brief Retrieve all keys from an unordered map
+ * 
+ * @tparam[in] T - generic class
+ * @tparam[in] R - generic class
+ * @param[in] map - The map to search through
+ * @return std::vector<T> - The keys
+ */
 template <class T, class R>
 std::vector<T> getKeys(std::unordered_map<T, R> map)
 {
@@ -26,15 +36,17 @@ std::vector<T> getKeys(std::unordered_map<T, R> map)
     return v;
 }
 
-
+/**
+ * @brief Object for storing all of the .csv values in a single place
+ */
 class LogDatabase
 {
     public:
-        LogDatabase(std::string filename);
+        LogDatabase(const std::string& filename);
         LogDatabase();
-        void parseFile(std::string filename);
-        std::vector<std::string> getValuesOfField(std::string fieldname) const;
-        const std::vector<std::string> getFieldnames() const;
+        void parseFile(const std::string& filename);
+        std::vector<std::string> getValuesOfField(const std::string& fieldname) const;
+        std::vector<std::string> getFieldnames() const;
         FieldMap getFieldMap() const;
     private:
         FieldMap m_logMap;

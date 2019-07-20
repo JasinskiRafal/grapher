@@ -6,6 +6,13 @@
 #include "graph.hpp"
 #include "gnuplot-iostream.h"
 
+/**
+ * @brief Allows a graph object to be directly streamed to a GNU plot
+ * 
+ * @param[out] gp - GNUplot object to be streamed to
+ * @param[in] g - Graph the data is taken from 
+ * @return Gnuplot&
+ */
 Gnuplot& operator<<(Gnuplot& gp, const Graph& g)
 {
     //  Add our values to the plot
@@ -19,40 +26,82 @@ Gnuplot& operator<<(Gnuplot& gp, const Graph& g)
 ////////////////////////////////////
 // Graph implementation
 ////////////////////////////////////
-Graph::Graph(std::pair<std::string, std::vector<std::string>> field)
+
+/** 
+ * @brief Constructs a graph given a single field and its info
+ * @param[in] field - A pair of a field and its values (as strings)
+ */
+Graph::Graph(const FieldPair& field)
 {
     // Populate our internal representation of value and scale 
     m_fieldname = field.first;
     m_fieldvalues = field.second;
     this->parseValues(m_fieldvalues);
 }
+/**
+ * @brief Default constructor
+ */
 Graph::Graph() {}
 
+/**
+ * @brief Get the values on the x axis
+ * 
+ * @return std::vector<int>
+ */
 std::vector<int> Graph::getXvalues() const
 {
     return m_x_values;
 }
+
+/**
+ * @brief Get the values on the y axis
+ * 
+ * @return std::vector<float> 
+ */
 std::vector<float> Graph::getYvalues() const
 {
     return m_y_values;
 }
 
+/**
+ * @brief Get the domain, anything outside of this on the
+ * x axis will not be graphed.
+ * 
+ * @return graphBounds - Max, min, and scale
+ */
 graphBounds Graph::getDomain() const
 {
     return m_domain;
 }
 
+/**
+ * @brief Get the range, anything outside of this on the
+ * y axis will not be graphed.
+ * 
+ * @return graphBounds - Max, min, and scale
+ */
 graphBounds Graph::getRange() const
 {
     return m_range;
 }
 
+/**
+ * @brief Get the name of the graphed field
+ * 
+ * @return std::string 
+ */
 std::string Graph::getFieldname() const
 {
     return m_fieldname;
 }
 
-void Graph::parseValues(std::vector<std::string> fieldvalues)
+/**
+ * @brief Convert the values of the field to the y axis. Assumes
+ * the x values to be ascending integers
+ * 
+ * @param[in] fieldvalues - values of the field as strings
+ */
+void Graph::parseValues(const std::vector<std::string>& fieldvalues)
 {
     // Buffer input so we don't add to our class variables if we get
     // an exception
@@ -99,7 +148,13 @@ void Graph::parseValues(std::vector<std::string> fieldvalues)
 // GraphGroup implementation
 ////////////////////////////////////
 
-GraphGroup::GraphGroup(FieldMap fieldMap)
+/**
+ * @brief Construct a group of graphs with each field mapping
+ * to a new graph
+ * 
+ * @param[in] fieldMap - mapping of fields to a list of values
+ */
+GraphGroup::GraphGroup(const FieldMap& fieldMap)
 {
     for (auto const& pair : fieldMap)
     {
@@ -111,23 +166,43 @@ GraphGroup::GraphGroup(FieldMap fieldMap)
     }
 }
 
-// Copy constructor
+/**
+ * @brief Copy constructor
+ * 
+ * @param[in] gGroup
+ */
 GraphGroup::GraphGroup(const GraphGroup& gGroup)
 {
     m_graphs = gGroup.m_graphs;
     this->expandScale(gGroup.getDomain(), gGroup.getDomain());
 }
 
-// Construct group from a single graph 
+/**
+ * @brief Construct a graph group from a single graph
+ * 
+ * @param g - The single graph
+ */
 GraphGroup::GraphGroup(const Graph& g)
 {
     m_graphs = {g};
     this->expandScale(g.getDomain(), g.getDomain());
 }
 
+/**
+ * @brief Default constructor
+ * 
+ */
 GraphGroup::GraphGroup() { }
 
-void GraphGroup::expandScale(graphBounds new_domain, graphBounds new_range)
+/**
+ * @brief Increases the domain and range if the new domain and
+ * range are larger
+ * 
+ * @param[in] new_domain 
+ * @param[in] new_range 
+ */
+void GraphGroup::expandScale(const graphBounds new_domain,
+                             const graphBounds new_range)
 {
     // Expands domain and range if needed
 
@@ -141,7 +216,12 @@ void GraphGroup::expandScale(graphBounds new_domain, graphBounds new_range)
 
 }
 
-void GraphGroup::removeGraph(std::string field)
+/**
+ * @brief Removes a graph from a group of graphs
+ * 
+ * @param[in] field - Name of the field to remove
+ */
+void GraphGroup::removeGraph(const std::string& field)
 {
     // Search for field in our graphs, remove it if it exists
     for (auto it = m_graphs.begin(); it != m_graphs.end();)
@@ -153,6 +233,11 @@ void GraphGroup::removeGraph(std::string field)
     }
 }
 
+/**
+ * @brief Draw every graph in a graph group via GNUplot
+ * 
+ * @param[in] gp - The stream to output to
+ */
 void GraphGroup::draw(Gnuplot& gp) const
 {
 
@@ -176,23 +261,42 @@ void GraphGroup::draw(Gnuplot& gp) const
     gp << "unset multiplot" << std::endl;
 }
 
+/**
+ * @brief Gets the vector of graphs from the group via copy
+ * 
+ * @return std::vector<Graph> 
+ */
 std::vector<Graph> GraphGroup::getGraphs() const
 {
     return m_graphs;
 }
 
+/**
+ * @brief Gets the domain of the group as a whole
+ * 
+ * @return graphBounds 
+ */
 graphBounds GraphGroup::getDomain() const
 {
     return m_domain;
 }
 
+/**
+ * @brief Gets the range of the group as a whole
+ * 
+ * @return graphBounds 
+ */
 graphBounds GraphGroup::getRange() const
 {
     return m_range;
 }
 
-
-//  Add graph into the group
+/**
+ * @brief Add a single graph to the group of graphs
+ * 
+ * @param[in] rhs 
+ * @return GraphGroup 
+ */
 GraphGroup GraphGroup::operator+=(const Graph& rhs)
 { 
     this->m_graphs.push_back(rhs);
@@ -201,6 +305,12 @@ GraphGroup GraphGroup::operator+=(const Graph& rhs)
     return (*this);
 }
 
+/**
+ * @brief Adds a group of graphs to this group of graphs
+ * 
+ * @param[in] rhs 
+ * @return GraphGroup 
+ */
 GraphGroup GraphGroup::operator+=(const GraphGroup& rhs)
 { 
     //  Add another graph group into the group
@@ -214,6 +324,12 @@ GraphGroup GraphGroup::operator+=(const GraphGroup& rhs)
     return (*this);
 }
 
+/**
+ * @brief Replaces the data of this graph with rhs
+ * 
+ * @param[in] rhs 
+ * @return GraphGroup 
+ */
 GraphGroup GraphGroup::operator=(const GraphGroup& rhs)
 { 
     this->m_graphs = rhs.getGraphs();

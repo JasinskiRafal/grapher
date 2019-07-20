@@ -5,15 +5,30 @@
 /////////////////////////////////////////////
 // LogDatabase implemenation
 /////////////////////////////////////////////
-LogDatabase::LogDatabase(std::string filename)
+/**
+ * @brief Reads in filename and creates a log database out of it
+ * 
+ * @param[in] filename - name of the .csv file
+ */
+LogDatabase::LogDatabase(const std::string& filename)
 {
     parseFile(filename);
 }
+
+/**
+ * @brief Default constructor 
+ */
 LogDatabase::LogDatabase()
 {
 }
 
-void LogDatabase::parseFile(std::string filename)
+/**
+ * @brief Reads through a csv file and populates LogDatabase's m_logMap
+ * with the values from filename
+ * 
+ * @param[in] filename - Input filename
+ */
+void LogDatabase::parseFile(const std::string& filename)
 {
     std::ifstream             file(filename);
     CSVIterator               row(file);
@@ -45,9 +60,14 @@ void LogDatabase::parseFile(std::string filename)
     return;
 }
 
-// Search for the field name in the database, grab the corresponding data points
+/**
+ * @brief Search for the field name in the database, grab the corresponding data points
+ * 
+ * @param[in] fieldname - field to search for
+ * @return std::vector<std::string> - values of the field
+ */
 std::vector<std::string>
-LogDatabase::getValuesOfField(std::string fieldname) const
+LogDatabase::getValuesOfField(const std::string& fieldname) const
 {
     auto search = m_logMap.find(fieldname);
     if (search == m_logMap.end())
@@ -63,12 +83,22 @@ LogDatabase::getValuesOfField(std::string fieldname) const
     
 }
 
-const std::vector<std::string> LogDatabase::getFieldnames() const
+/**
+ * @brief Get all of the fields in the LogDatabase
+ * 
+ * @return std::vector<std::string> - vector of fieldnames
+ */
+std::vector<std::string> LogDatabase::getFieldnames() const
 {
     // Get all the keys out of the unordered_map
     return getKeys(m_logMap);
 }
 
+/**
+ * @brief Returns a copy of the LogDatabase's fieldmap
+ * 
+ * @return FieldMap 
+ */
 FieldMap LogDatabase::getFieldMap() const
 {
     return m_logMap;

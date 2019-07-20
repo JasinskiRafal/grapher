@@ -8,19 +8,24 @@
 #include "csv_logdb.hpp"
 #include "graph.hpp"
 
+/**
+ * @brief An object representation of the command line interface.
+ */
 class CLI
 {
     public:
-        CLI(const LogDatabase logDb);
+        CLI(const LogDatabase& logDb);
         FieldMap getFieldsFromUser();
 
     private:
-        std::vector<std::string_view> fuzzySearchFields(std::string userInput);
+        std::vector<std::string_view>
+        fuzzySearchFields(const std::string& userInput);
         
         void removeField(std::vector<std::string_view>& fields,
-                         std::string_view fieldToRemove);
-        void printFields(WINDOW* stdscr, std::string userInput) const;
-        FieldMap fieldsToFieldMap(const std::vector<std::string_view> fields);
+                         const std::string_view& fieldToRemove);
+        void printFields(WINDOW* stdscr,
+                         const std::string& userInput) const;
+        FieldMap fieldsToFieldMap(const std::vector<std::string_view>& fields);
         // All of the fields the user can pick from
         const std::vector<std::string> m_allFields;
         // Below are string_views which are just views on allFields

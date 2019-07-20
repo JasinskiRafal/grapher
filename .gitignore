@@ -2,3 +2,5 @@
 **/venv/*
 .vscode/*
 *.code-workspace
+# Ignore documentation for now
+docs/*
