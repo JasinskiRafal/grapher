@@ -118,7 +118,8 @@ void CLI::printFields(WINDOW* stdscr, const std::string& userInput) const
         addstr("\n");
     }
     addstr("---------\n");
-    addstr((userInput + "\n").c_str());
+    addstr("---------\n");
+    addstr((">" + userInput + "\n").c_str());
 }
 
 /**

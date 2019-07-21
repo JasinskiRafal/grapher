@@ -22,8 +22,6 @@ add_compile_options(-pedantic -Werror)
 
 set(csv_DIR "src/csv")
 file(GLOB csv_SRC "${csv_DIR}/*.cpp")
-# Our CSV parser is going to be a library
-add_library(csvparse ${csv_SRC})
 
 set(cli_DIR "src/cli")
 file(GLOB cli_SRC "${cli_DIR}/*.cpp")
@@ -33,7 +31,7 @@ file(GLOB graph_SRC "${graph_DIR}/*.cpp")
 
 file(GLOB main_SRC "src/main.cpp")
 
-set(driver_SRC ${cli_SRC} ${graph_SRC} ${main_SRC})
+set(driver_SRC ${csv_SRC} ${cli_SRC} ${graph_SRC} ${main_SRC})
 set(driver_include_dirs ${csv_DIR} ${cli_DIR} ${graph_DIR})
 
 ### Doxygen Logic ####
@@ -66,8 +64,8 @@ target_compile_options(debug_driver PUBLIC -g)
 
 # Link ncurses since the CLI lib will need it
 # gnuplot-iostream requires Boost
-# The driver needs csvparse to take in csv files
-set(driver_LIBS csvparse ncurses ${Boost_LIBRARIES} Threads::Threads)
+# Grapher is multithreaded
+set(driver_LIBS ncurses ${Boost_LIBRARIES} Threads::Threads)
 
 target_link_libraries(driver ${driver_LIBS}) 
 target_link_libraries(debug_driver ${driver_LIBS}) 
