@@ -148,41 +148,19 @@ FieldMap CLI::getFieldsFromUser()
             case KEY_BACKSPACE:
             case 127:
             /* User has removed a character -----*/
-                if (userInput.size() > 0)
-                    userInput.pop_back();
-                m_matchedFields = fuzzySearchFields(userInput);
+                handleBackspace(userInput);
                 break;
             case KEY_ENTER:
             case 36:
             case 10:
             /* User has pressed enter ---------- */
-                if (userInput.empty())
-                {   // User is done making choices
-                    clear();
-                    endwin();
+                if(exitOnEnter(userInput))
                     return fieldsToFieldMap(m_pickedFields);
-                }
-                else if(m_matchedFields.size() == 1)
-                {
-                    // User chose a field
-                    m_pickedFields.push_back(m_matchedFields.front());
-                    // Remove it from our unpicked fields
-                    removeField(m_unpickedFields, m_matchedFields.front());
-                    userInput.clear(); // Clear our input
-                    m_matchedFields = m_unpickedFields;
-                }
-                else
-                {
-                    // Invalid choice
-                    userInput.clear();
-                    m_matchedFields = m_unpickedFields; // Our input is clear
-                }
                 break;
             default:
             /* User has pressed any key other
                than ENTER or BACKSPACE ---------- */
-                userInput += static_cast<char>(ch);
-                m_matchedFields = fuzzySearchFields(userInput);
+                handleNewChar(userInput, static_cast<char>(ch));
                 break;
         } // End of switch(ch)
 
@@ -192,6 +170,66 @@ FieldMap CLI::getFieldsFromUser()
 
     } // End of for (;;)
 
+}
+
+/**
+ * @brief Handles a backspace character sent from the user
+ * 
+ * @param[out] userInput - Removes a character from the user's input
+ */
+void CLI::handleBackspace(std::string& userInput)
+{
+    if (userInput.size() > 0)
+        userInput.pop_back();
+    m_matchedFields = fuzzySearchFields(userInput);
+}
+
+/**
+ * @brief Handles an enter character sent from the user. Depending
+ * on context, the user may want to stop picking fields.
+ * 
+ * @param[out] userInput - Clears the string
+ * @return true - The user is done picking values
+ * @return false - The user is not done picking values
+ */
+bool CLI::exitOnEnter(std::string& userInput)
+{
+    bool timeToExit = false;
+    if (userInput.empty())
+    {   // User is done making choices
+        clear();
+        endwin();
+        timeToExit = true;
+    }
+    else if(m_matchedFields.size() == 1)
+    {
+        // User chose a field
+        m_pickedFields.push_back(m_matchedFields.front());
+        // Remove it from our unpicked fields
+        removeField(m_unpickedFields, m_matchedFields.front());
+        userInput.clear(); // Clear our input
+        m_matchedFields = m_unpickedFields;
+    }
+    else
+    {
+        // Invalid choice
+        userInput.clear();
+        m_matchedFields = m_unpickedFields; // Our input is clear
+    }
+
+    return timeToExit;
+}
+
+/**
+ * @brief Appends the new character to the user's input string
+ * 
+ * @param[out] userInput - Appends to string
+ * @param[in] newChar - The new character to add
+ */
+void CLI::handleNewChar(std::string& userInput, char newChar)
+{
+    userInput += newChar;
+    m_matchedFields = fuzzySearchFields(userInput);
 }
 
 /**

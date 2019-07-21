@@ -25,7 +25,14 @@ class CLI
                          const std::string_view& fieldToRemove);
         void printFields(WINDOW* stdscr,
                          const std::string& userInput) const;
+
+        void handleBackspace(std::string& userInput);
+        bool exitOnEnter(std::string& userInput);
+        void handleNewChar(std::string& userInput, char newChar);
+
         FieldMap fieldsToFieldMap(const std::vector<std::string_view>& fields);
+
+
         // All of the fields the user can pick from
         const std::vector<std::string> m_allFields;
         // Below are string_views which are just views on allFields
